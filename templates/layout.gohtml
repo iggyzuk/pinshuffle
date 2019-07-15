@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Shuffle</title>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="Get Reinspired">
+  <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity">
+  <meta name="author" content="Iggy Zuk">
+
+  <link rel="stylesheet" href="/res/style.css">
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/2.1.2/packery.pkgd.min.js"></script>
+  <script src="/res/script.js"></script>
+</head>
+
+<body>
+
+  <div class="container-fluid p-1">
+
+    {{ if not .Authenticated }}
+
+    <!-- Intro Modal -->
+    <div class="modal fade" id="intro-modal" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">🃏 Shuffle Your Pinterest Boards</h4>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <p class="lead"><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
+            <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/">Pinterest</a>.</p>
+            <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Show intro modal on load -->
+    <script type="text/javascript">
+      $(window).on('load',function(){
+          $('#intro-modal').modal('show');
+      });
+    </script>
+    {{ end }}
+
+    {{ if .Error }}
+    <div class="alert alert-danger alert-dismissible fade show">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {{ .Error }}
+    </div>
+    {{ else if .Message }}
+    <div class="alert alert-primary alert-dismissible fade show">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {{ .Message }}
+    </div>
+    {{ end }}
+
+    <div class="grid">
+      {{ range .Pins }}
+      <div class="grid-item">
+        <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
+        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/res/img/pin.png"/></a>
+      </div>
+      {{ end }}
+    </div>
+
+    <!-- Bottom buttons -->
+    <div class="fixed-bottom content p-1">
+      <div>
+        <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#info-modal">ⓘ Info</button>
+
+        <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
+
+        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Boards Modal -->
+  <div class="modal fade" id="boards-modal">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <!-- Modal eader -->
+        <div class="modal-header">
+          <h4 class="modal-title">⌗ Boards</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <ul class="list-group">
+
+            {{ range .Boards }}
+            <a href="{{ .URL }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                {{ .Name }} <span class="badge badge-danger badge-pill">{{ .PinCoint }}</span>
+            </a>
+            {{ end }}
+
+            </a>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div class="modal fade" id="info-modal">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <!-- Modal header -->
+        <div class="modal-header">
+          <h4 class="modal-title">ⓘ Info</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+
+          <div class="content">
+            <p><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="list-group">
+            <dl><h5>👁 Theme:</h5></dl>
+            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">Light</button>
+            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">Dark</button>
+          </div>
+
+          <!-- Switch themes -->
+          <script>
+          $("button[data-theme]").click(function() {
+            setCookie("selected_theme", $(this).data("theme"), 365);
+            $("head link#theme").attr("href", $(this).data("theme"));
+          });
+
+          </script>
+
+          <hr class="my-4">
+
+          <div class="content">
+            <dl><h5>🔒 Privacy:</h5></dl>
+            <p>Cookies for access token and selected theme</p>
+          </div>
+
+          <p class="small text-right">Made by <a href="http://iggyzuk.com">Iggy Zuk</a></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

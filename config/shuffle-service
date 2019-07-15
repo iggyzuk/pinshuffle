@@ -1,0 +1,15 @@
+[Unit]
+Description=Web service that shuffles pinterest pins
+After=network.target auditd.service
+
+[Service]
+EnvironmentFile=/var/www/config/env
+ExecStart=/var/www/shuffle
+ExecReload=/var/www/shuffle
+KillMode=process
+Restart=always
+RestartPreventExitStatus=255
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
