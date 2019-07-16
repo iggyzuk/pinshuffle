@@ -59,8 +59,6 @@ type neuteredFileSystem struct {
 
 func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
 
-	log.Print(path)
-
 	// Check if path exists
 	f, err := nfs.fs.Open(path)
 	if err != nil {
