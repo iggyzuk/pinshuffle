@@ -28,6 +28,8 @@ func main() {
 		neuteredFileSystem{http.Dir(staticAssetsDir)},
 	)
 
+	log.Println(http.Dir(staticAssetsDir))
+
 	mux := http.NewServeMux()
 	mux.Handle("/res/", http.StripPrefix("/res/", fs))
 	mux.HandleFunc("/", indexHandler)

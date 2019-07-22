@@ -1,5 +1,5 @@
 TEMPLATES_DIR=/var/www/templates
-STATIC_ASSETS_DIR=/var/www/static
+STATIC_ASSETS_DIR=/var/www/res
 TLS_CERT_PATH=/etc/letsencrypt/live/shuffle.iggyzuk.com/cert.pem
 TLS_KEY_PATH=/etc/letsencrypt/live/shuffle.iggyzuk.com/privkey.pem
 CLIENT_ID=5042575073353970546
