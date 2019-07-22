@@ -16,18 +16,17 @@ func GetBoardsPins(client *pinterest.Client, boards []string, accessToken string
 	for _, board := range boards {
 		log.Println("Board: " + board)
 
-		pins, boardError := getBoardPins(
+		pins, err := getBoardPins(
 			client,
 			board,
 			accessToken,
 		)
 
-		allPins = append(allPins, *pins...)
-
-		if boardError != nil {
-			return nil, boardError
+		if err != nil {
+			return nil, err
 		}
 
+		allPins = append(allPins, *pins...)
 	}
 	return &allPins, nil
 }

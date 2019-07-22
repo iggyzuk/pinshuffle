@@ -53,6 +53,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 			} else {
 
+				// this fills up the board modal
 				for _, board := range *boards {
 					userSlashBoard := strings.ToLower(user.Username + "/" + path.Base(board.Url))
 					tmplData.Boards = append(tmplData.Boards, models.Board{
