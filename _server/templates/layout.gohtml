@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Shuffle</title>
+  <title>Shuffle – Pinterest Board Randomizer</title>
   <meta charset="utf-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
@@ -90,7 +90,7 @@
 
         <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
 
-        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
+        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ .TotalBoards }}</span></button>
       </div>
     </div>
 
@@ -118,7 +118,20 @@
             <!-- List Group -->
             <div class="list-group">
 
+              {{ if len ( .Boards ) }}
+              <div class="list-group-item bg-success">Your Boards:</div>
+              {{ end }}
+
               {{ range .Boards }}
+              <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
+              <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
+              {{ end }}
+
+              {{ if len ( .FollowedBoards ) }}
+              <div class="list-group-item bg-success">Followed Boards:</div>
+              {{ end }}
+
+              {{ range .FollowedBoards }}
               <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
               <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
               {{ end }}

@@ -16,10 +16,12 @@ type Board struct {
 
 // TemplateData is the main object we pass for templating HTML
 type TemplateData struct {
-	OAuthURL      string
-	Authenticated bool
-	Error         string
-	Message       string
-	Pins          []Pin
-	Boards        []Board
+	OAuthURL       string
+	Authenticated  bool
+	Error          string
+	Message        string
+	Pins           []Pin
+	Boards         []Board
+	FollowedBoards []Board
+	TotalBoards    int
 }

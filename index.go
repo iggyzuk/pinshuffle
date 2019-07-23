@@ -7,22 +7,72 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
-	"strings"
 
+	goctrl "github.com/carrot/go-pinterest/controllers"
 	"iggyzuk.com/shuffle/controllers"
 	"iggyzuk.com/shuffle/models"
 )
 
-var oauthURL = "https://api.pinterest.com/oauth/?response_type=code&redirect_uri=" + rootURL + "/redirect&client_id=" + clientID + "&scope=read_public"
+var oauthURL = "https://api.pinterest.com/oauth/?response_type=code&redirect_uri=" + rootURL + "/redirect&client_id=" + clientID + "&scope=read_public,read_relationships"
+
+func fetchMyBoards(tmplData *models.TemplateData) {
+	boards, err := client.Me.Boards.Fetch()
+
+	if err != nil {
+		log.Println(err.Error())
+		tmplData.Error = err.Error()
+		return
+	}
+
+	// Sort boards by name
+	sort.Slice(*boards, func(a, b int) bool {
+		return (*boards)[a].Name < (*boards)[b].Name
+	})
+
+	// this fills up the board modal
+	for _, board := range *boards {
+		tmplData.Boards = append(tmplData.Boards, models.Board{
+			Name:     board.Name,
+			URL:      path.Base(board.Creator.Url) + "/" + path.Base(board.Url),
+			PinCoint: board.Counts.Pins,
+		})
+	}
+}
+
+func fetchFollowedBoards(tmplData *models.TemplateData) {
+	optionals := goctrl.MeFollowingBoardsFetchOptionals{}
+	boards, _, err := client.Me.Following.Boards.Fetch(&optionals)
+
+	if err != nil {
+		log.Println(err.Error())
+		tmplData.Error = err.Error()
+		return
+	}
+
+	// Sort boards by name
+	sort.Slice(*boards, func(a, b int) bool {
+		return (*boards)[a].Name < (*boards)[b].Name
+	})
+
+	// this fills up the board modal
+	for _, board := range *boards {
+		tmplData.FollowedBoards = append(tmplData.FollowedBoards, models.Board{
+			Name:     board.Name,
+			URL:      path.Base(board.Creator.Url) + "/" + path.Base(board.Url),
+			PinCoint: board.Counts.Pins,
+		})
+	}
+}
 
 // renders page after passing some data to the HTML template
 func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 	tmplData := models.TemplateData{
-		OAuthURL:      oauthURL,
-		Authenticated: false,
-		Boards:        []models.Board{},
-		Pins:          []models.Pin{},
+		OAuthURL:       oauthURL,
+		Authenticated:  false,
+		Boards:         []models.Board{},
+		FollowedBoards: []models.Board{},
+		Pins:           []models.Pin{},
 	}
 
 	accessTokenCookie, err := req.Cookie("access_token")
@@ -35,7 +85,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 		client = client.RegisterAccessToken(accessTokenCookie.Value)
 
-		user, err := client.Me.Fetch()
+		_, err := client.Me.Fetch()
 
 		if err != nil {
 			log.Println(err.Error())
@@ -46,29 +96,10 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 			tmplData.Authenticated = true
 
-			boards, err := client.Me.Boards.Fetch()
+			fetchMyBoards(&tmplData)
+			fetchFollowedBoards(&tmplData)
 
-			if err != nil {
-				log.Println(err.Error())
-				tmplData.Error = err.Error()
-
-			} else if len(*boards) > 0 {
-
-				// Sort boards by name
-				sort.Slice(*boards, func(a, b int) bool {
-					return (*boards)[a].Name < (*boards)[b].Name
-				})
-
-				// this fills up the board modal
-				for _, board := range *boards {
-					userSlashBoard := strings.ToLower(user.Username + "/" + path.Base(board.Url))
-					tmplData.Boards = append(tmplData.Boards, models.Board{
-						Name:     board.Name,
-						URL:      userSlashBoard,
-						PinCoint: board.Counts.Pins,
-					})
-				}
-			}
+			tmplData.TotalBoards = len(tmplData.Boards) + len(tmplData.FollowedBoards)
 
 			boardKeys := controllers.ParseBoards(req.URL)
 
@@ -94,7 +125,6 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 			} else {
 				tmplData.Message = "You can select your boards in the bottom right. You can also modify the URL directly: ?b=username/board"
 			}
-
 		}
 	}
 
