@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"iggyzuk.com/shuffle/controllers"
@@ -51,7 +52,12 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 				log.Println(err.Error())
 				tmplData.Error = err.Error()
 
-			} else {
+			} else if len(*boards) > 0 {
+
+				// Sort boards by name
+				sort.Slice(*boards, func(a, b int) bool {
+					return (*boards)[a].Name < (*boards)[b].Name
+				})
 
 				// this fills up the board modal
 				for _, board := range *boards {
