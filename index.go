@@ -74,9 +74,14 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 			if len(boardKeys) > 0 {
 
+				max := controllers.ParseMax(req.URL)
+
+				controllers.Randomize()
+
 				pins, err := controllers.GetBoardsPins(
 					client,
 					boardKeys,
+					max,
 					accessTokenCookie.Value,
 				)
 

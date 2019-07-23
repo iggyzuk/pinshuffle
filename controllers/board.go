@@ -10,7 +10,9 @@ import (
 )
 
 // GetBoardsPins returns a pointer to a slice contains ALL pins from ALL the boards
-func GetBoardsPins(client *pinterest.Client, boards []string, accessToken string) (*[]models.Pin, error) {
+func GetBoardsPins(client *pinterest.Client, boards []string, max int32, accessToken string) (*[]models.Pin, error) {
+	pinsPerBoard := int(max) / len(boards)
+
 	var allPins []models.Pin
 
 	for _, board := range boards {
@@ -26,8 +28,11 @@ func GetBoardsPins(client *pinterest.Client, boards []string, accessToken string
 			return nil, err
 		}
 
+		trim(pins, pinsPerBoard)
+
 		allPins = append(allPins, *pins...)
 	}
+
 	return &allPins, nil
 }
 
