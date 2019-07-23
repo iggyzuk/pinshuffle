@@ -58,7 +58,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 					userSlashBoard := strings.ToLower(user.Username + "/" + path.Base(board.Url))
 					tmplData.Boards = append(tmplData.Boards, models.Board{
 						Name:     board.Name,
-						URL:      rootURL + "/?b=" + userSlashBoard,
+						URL:      userSlashBoard,
 						PinCoint: board.Counts.Pins,
 					})
 				}
