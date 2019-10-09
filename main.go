@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+  "crypto/tls"
 
 	"github.com/carrot/go-pinterest"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 var staticAssetsDir = os.Getenv("STATIC_ASSETS_DIR")
@@ -20,7 +22,7 @@ var client *pinterest.Client
 
 func main() {
 	// http to https redirection
-	go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
+	// go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
 
 	client = pinterest.NewClient()
 
@@ -35,6 +37,22 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/redirect", pinterestRedirectHandler)
 
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist("shuffle.iggyzuk.com"), //Your domain here
+		Cache:      autocert.DirCache("/etc/letsencrypt/live/shuffle.iggyzuk.com/"), //Folder for storing certificates
+	}
+
+	server := &http.Server{
+		Addr: ":https",
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+		Handler: mux,
+	}
+
+	go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
+
 	// Launch TLS server
-	log.Fatal(http.ListenAndServeTLS(":443", tlsCertPath, tlsKeyPath, mux))
+	log.Fatal(server.ListenAndServeTLS("", ""))
 }
