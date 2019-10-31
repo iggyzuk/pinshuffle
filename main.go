@@ -1,12 +1,12 @@
 package main
 
 import (
+	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
-  "crypto/tls"
 
-	"github.com/carrot/go-pinterest"
+	pinterest "github.com/a-frony/go-pinterest"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -39,7 +39,7 @@ func main() {
 
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("shuffle.iggyzuk.com"), //Your domain here
+		HostPolicy: autocert.HostWhitelist("shuffle.iggyzuk.com"),                   //Your domain here
 		Cache:      autocert.DirCache("/etc/letsencrypt/live/shuffle.iggyzuk.com/"), //Folder for storing certificates
 	}
 

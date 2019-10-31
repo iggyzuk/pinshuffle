@@ -4,18 +4,32 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"path"
+	"net/url"
 	"path/filepath"
 	"sort"
+	"strings"
 
-	goctrl "github.com/carrot/go-pinterest/controllers"
+	pinterestControllers "github.com/a-frony/go-pinterest/controllers"
+	pinterestModels "github.com/a-frony/go-pinterest/models"
 	"iggyzuk.com/shuffle/controllers"
 	"iggyzuk.com/shuffle/models"
 )
 
 var oauthURL = "https://api.pinterest.com/oauth/?response_type=code&redirect_uri=" + rootURL + "/redirect&client_id=" + clientID + "&scope=read_public,read_relationships"
 
+var user *pinterestModels.User
+
+func boardFromURL(boardUrl string) string {
+	u, _ := url.Parse(boardUrl)
+	board := u.Path
+	board = strings.TrimPrefix(board, "/")
+	board = strings.TrimSuffix(board, "/")
+	return board
+}
+
 func fetchMyBoards(tmplData *models.TemplateData) {
+	user, _ = client.Me.Fetch()
+
 	boards, err := client.Me.Boards.Fetch()
 
 	if err != nil {
@@ -31,16 +45,17 @@ func fetchMyBoards(tmplData *models.TemplateData) {
 
 	// this fills up the board modal
 	for _, board := range *boards {
+
 		tmplData.Boards = append(tmplData.Boards, models.Board{
 			Name:     board.Name,
-			URL:      path.Base(board.Creator.Url) + "/" + path.Base(board.Url),
+			URL:      boardFromURL(board.Url),
 			PinCoint: board.Counts.Pins,
 		})
 	}
 }
 
 func fetchFollowedBoards(tmplData *models.TemplateData) {
-	optionals := goctrl.MeFollowingBoardsFetchOptionals{}
+	optionals := pinterestControllers.MeFollowingBoardsFetchOptionals{}
 	boards, _, err := client.Me.Following.Boards.Fetch(&optionals)
 
 	if err != nil {
@@ -56,9 +71,10 @@ func fetchFollowedBoards(tmplData *models.TemplateData) {
 
 	// this fills up the board modal
 	for _, board := range *boards {
+
 		tmplData.FollowedBoards = append(tmplData.FollowedBoards, models.Board{
 			Name:     board.Name,
-			URL:      path.Base(board.Creator.Url) + "/" + path.Base(board.Url),
+			URL:      boardFromURL(board.Url),
 			PinCoint: board.Counts.Pins,
 		})
 	}

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/carrot/go-pinterest"
-	"github.com/carrot/go-pinterest/controllers"
+	pinterest "github.com/a-frony/go-pinterest"
+	"github.com/a-frony/go-pinterest/controllers"
 	"iggyzuk.com/shuffle/models"
 )
 
@@ -70,7 +70,7 @@ func getPagePins(client *pinterest.Client, board string, cursor string) (*[]mode
 		board,
 		&controllers.BoardsPinsFetchOptionals{
 			Cursor: cursor,
-			Limit:  100,
+			Limit:  "100",
 		},
 	)
 
