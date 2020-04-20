@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"log"
+	"time"
 
 	pinterest "github.com/a-frony/go-pinterest"
 	"github.com/a-frony/go-pinterest/controllers"
@@ -86,6 +87,8 @@ func getPagePins(client *pinterest.Client, board string, cursor string) (*[]mode
 			Color:    pin.Color,
 		})
 	}
+
+	time.Sleep(1000 * time.Millisecond)
 
 	return &pagePins, page.Cursor, nil
 }

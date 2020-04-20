@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	pinterestControllers "github.com/a-frony/go-pinterest/controllers"
 	pinterestModels "github.com/a-frony/go-pinterest/models"
@@ -52,6 +53,8 @@ func fetchMyBoards(tmplData *models.TemplateData) {
 			PinCoint: board.Counts.Pins,
 		})
 	}
+
+	time.Sleep(1000 * time.Millisecond)
 }
 
 func fetchFollowedBoards(tmplData *models.TemplateData) {
@@ -78,6 +81,8 @@ func fetchFollowedBoards(tmplData *models.TemplateData) {
 			PinCoint: board.Counts.Pins,
 		})
 	}
+
+	time.Sleep(1000 * time.Millisecond)
 }
 
 // renders page after passing some data to the HTML template
