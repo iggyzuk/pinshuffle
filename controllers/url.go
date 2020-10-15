@@ -28,7 +28,7 @@ func ParseMax(URL *url.URL) int32 {
 	maxes, ok := URL.Query()["max"]
 
 	if !ok {
-		return 1000
+		return 10000
 	}
 
 	i, err := strconv.ParseInt(maxes[0], 10, 32)
