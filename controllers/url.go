@@ -7,7 +7,10 @@ import (
 )
 
 // ParseBoards returns a slice with board names from the URL
-func ParseBoards(URL *url.URL) []string {
+func ParseBoards(stringURL string) []string {
+
+	URL, _ := url.Parse(stringURL)
+
 	bs, ok := URL.Query()["b"]
 
 	if !ok {
@@ -24,7 +27,10 @@ func ParseBoards(URL *url.URL) []string {
 }
 
 // ParseMax returns the max number of pins from URL
-func ParseMax(URL *url.URL) int32 {
+func ParseMax(stringURL string) int32 {
+
+	URL, _ := url.Parse(stringURL)
+
 	maxes, ok := URL.Query()["max"]
 
 	if !ok {

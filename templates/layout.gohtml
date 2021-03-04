@@ -11,20 +11,20 @@
   <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity">
   <meta name="author" content="Iggy Zuk">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/res/img/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/res/img/favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/res/img/favicon/favicon-16x16.png">
-  <link rel="manifest" href="/res/img/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/img/favicon/site.webmanifest">
 
-  <link rel="stylesheet" href="/res/style/main.css">
-  <link rel="stylesheet" href="/res/style/checkbox.css">
+  <link rel="stylesheet" href="/style/main.css">
+  <link rel="stylesheet" href="/style/checkbox.css">
   <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/2.1.2/packery.pkgd.min.js"></script>
-  <script src="/res/script.js"></script>
+  <script src="/script.js"></script>
 </head>
 
 <body>
@@ -78,7 +78,7 @@
       {{ range .Pins }}
       <div class="grid-item">
         <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
-        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/res/img/pin.png"/></a>
+        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/img/pin.png"/></a>
       </div>
       {{ end }}
     </div>

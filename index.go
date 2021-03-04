@@ -1,15 +1,13 @@
 package main
 
 import (
-	"html/template"
 	"log"
-	"net/http"
 	"net/url"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	pinterestControllers "github.com/iggyzuk/go-pinterest/controllers"
 	pinterestModels "github.com/iggyzuk/go-pinterest/models"
 	"github.com/iggyzuk/shuffle/controllers"
@@ -86,7 +84,7 @@ func fetchFollowedBoards(tmplData *models.TemplateData) {
 }
 
 // renders page after passing some data to the HTML template
-func indexHandler(w http.ResponseWriter, req *http.Request) {
+func indexHandler(c *fiber.Ctx) error {
 
 	tmplData := models.TemplateData{
 		OAuthURL:       oauthURL,
@@ -96,15 +94,20 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		Pins:           []models.Pin{},
 	}
 
-	accessTokenCookie, err := req.Cookie("access_token")
+	accessTokenCookie := new(fiber.Cookie)
+	accessTokenCookie.Name = "access_token"
+	accessTokenCookie.Value = "access_token"
+	accessTokenCookie.Expires = time.Now().Add(24 * time.Hour)
 
-	if err == http.ErrNoCookie {
+	c.Cookie(accessTokenCookie)
+
+	if c.Cookies(accessTokenCookie.Name) == "" {
 		log.Println("Missing Cookie")
 
 	} else {
 		log.Println("Cookie Exists")
 
-		client = client.RegisterAccessToken(accessTokenCookie.Value)
+		client = client.RegisterAccessToken(accessTokenCookie.Name)
 
 		_, err := client.Me.Fetch()
 
@@ -122,11 +125,11 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 			tmplData.TotalBoards = len(tmplData.Boards) + len(tmplData.FollowedBoards)
 
-			boardKeys := controllers.ParseBoards(req.URL)
+			boardKeys := controllers.ParseBoards(c.OriginalURL())
 
 			if len(boardKeys) > 0 {
 
-				max := controllers.ParseMax(req.URL)
+				max := controllers.ParseMax(c.OriginalURL())
 
 				controllers.Randomize()
 
@@ -149,10 +152,5 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	// Build path to template
-	tmplPath := filepath.Join("/templates", "layout.gohtml")
-	// Load template from disk
-	tmpl := template.Must(template.ParseFiles(tmplPath))
-
-	tmpl.Execute(w, tmplData)
+	return c.Render("layout", tmplData)
 }

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"crypto/tls"
-	"log"
-	"net/http"
 	"os"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
+	"github.com/gofiber/template/html"
 	pinterest "github.com/iggyzuk/go-pinterest"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 var tlsCertPath = os.Getenv("TLS_CERT_PATH")
@@ -25,33 +25,38 @@ func main() {
 
 	client = pinterest.NewClient()
 
-	fs := http.FileServer(
-		neuteredFileSystem{http.Dir("/static")},
-	)
+	// Initialize standard Go html template engine
+	engine := html.New("./templates", ".gohtml")
 
-	log.Println(http.Dir("/static"))
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
-	mux := http.NewServeMux()
-	mux.Handle("/res/", http.StripPrefix("/res/", fs))
-	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/redirect", pinterestRedirectHandler)
+	// Default middleware config
+	app.Use(logger.New())
+	app.Use("/monitor", monitor.New())
 
-	certManager := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(domainName),                             //Your domain here
-		Cache:      autocert.DirCache("/etc/letsencrypt/live/" + domainName + "/"), //Folder for storing certificates
+	// Load static files like CSS, Images & JavaScript.
+	app.Static("/static", "./static")
+
+	app.Get("/", indexHandler)
+	app.Get("/redirect", pinterestRedirectHandler)
+
+	// 404 handler.
+	app.Use(func(c *fiber.Ctx) error {
+		return c.SendStatus(404) // => 404 "Not Found"
+	})
+
+	// mux.Handle("/res/", http.StripPrefix("/res/", fs))
+
+	// Get port from env vars.
+	var port = os.Getenv("PORT")
+
+	// Use a default port if none was set in env.
+	if port == "" {
+		port = "3000"
 	}
 
-	server := &http.Server{
-		Addr: ":https",
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
-		Handler: mux,
-	}
-
-	go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
-
-	// Launch TLS server
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	// Start server on http://${heroku-url}:${port}
+	app.Listen(":" + port)
 }
