@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"iggyzuk.com/shuffle/models"
+	"github.com/iggyzuk/shuffle/models"
 )
 
 // Randomize will seed based on current time

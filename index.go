@@ -10,18 +10,18 @@ import (
 	"strings"
 	"time"
 
-	pinterestControllers "github.com/a-frony/go-pinterest/controllers"
-	pinterestModels "github.com/a-frony/go-pinterest/models"
-	"iggyzuk.com/shuffle/controllers"
-	"iggyzuk.com/shuffle/models"
+	pinterestControllers "github.com/iggyzuk/go-pinterest/controllers"
+	pinterestModels "github.com/iggyzuk/go-pinterest/models"
+	"github.com/iggyzuk/shuffle/controllers"
+	"github.com/iggyzuk/shuffle/models"
 )
 
 var oauthURL = "https://api.pinterest.com/oauth/?response_type=code&redirect_uri=" + rootURL + "/redirect&client_id=" + clientID + "&scope=read_public,read_relationships"
 
 var user *pinterestModels.User
 
-func boardFromURL(boardUrl string) string {
-	u, _ := url.Parse(boardUrl)
+func boardFromURL(boardURL string) string {
+	u, _ := url.Parse(boardURL)
 	board := u.Path
 	board = strings.TrimPrefix(board, "/")
 	board = strings.TrimSuffix(board, "/")
@@ -150,7 +150,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Build path to template
-	tmplPath := filepath.Join(templatesDir, "layout.gohtml")
+	tmplPath := filepath.Join("/templates", "layout.gohtml")
 	// Load template from disk
 	tmpl := template.Must(template.ParseFiles(tmplPath))
 

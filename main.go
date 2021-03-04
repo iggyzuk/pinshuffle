@@ -6,17 +6,16 @@ import (
 	"net/http"
 	"os"
 
-	pinterest "github.com/a-frony/go-pinterest"
+	pinterest "github.com/iggyzuk/go-pinterest"
 	"golang.org/x/crypto/acme/autocert"
 )
 
-var staticAssetsDir = os.Getenv("STATIC_ASSETS_DIR")
-var templatesDir = os.Getenv("TEMPLATES_DIR")
 var tlsCertPath = os.Getenv("TLS_CERT_PATH")
 var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
 var clientID = os.Getenv("CLIENT_ID")
 var clientSecret = os.Getenv("CLIENT_SECRET")
 var rootURL = os.Getenv("ROOT_URL")
+var domainName = "shuffle.iggyzuk.com"
 
 var client *pinterest.Client
 
@@ -27,10 +26,10 @@ func main() {
 	client = pinterest.NewClient()
 
 	fs := http.FileServer(
-		neuteredFileSystem{http.Dir(staticAssetsDir)},
+		neuteredFileSystem{http.Dir("/static")},
 	)
 
-	log.Println(http.Dir(staticAssetsDir))
+	log.Println(http.Dir("/static"))
 
 	mux := http.NewServeMux()
 	mux.Handle("/res/", http.StripPrefix("/res/", fs))
@@ -39,8 +38,8 @@ func main() {
 
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("shuffle.iggyzuk.com"),                   //Your domain here
-		Cache:      autocert.DirCache("/etc/letsencrypt/live/shuffle.iggyzuk.com/"), //Folder for storing certificates
+		HostPolicy: autocert.HostWhitelist(domainName),                             //Your domain here
+		Cache:      autocert.DirCache("/etc/letsencrypt/live/" + domainName + "/"), //Folder for storing certificates
 	}
 
 	server := &http.Server{

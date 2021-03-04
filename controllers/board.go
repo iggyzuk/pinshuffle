@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	pinterest "github.com/a-frony/go-pinterest"
-	"github.com/a-frony/go-pinterest/controllers"
-	"iggyzuk.com/shuffle/models"
+	pinterest "github.com/iggyzuk/go-pinterest"
+	controllers "github.com/iggyzuk/go-pinterest/controllers"
+	"github.com/iggyzuk/shuffle/models"
 )
 
 // GetBoardsPins returns a pointer to a slice contains ALL pins from ALL the boards
