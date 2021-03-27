@@ -45,9 +45,12 @@
 
           <!-- Modal body -->
           <div class="modal-body">
+            <div class="alert alert-warning" role="alert">
+              Shuffle is currently broken due Pinterest API getting deprecated. It will get fixed when the new version becomes available.
+            </div>
             <p class="lead"><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
-            <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/">Pinterest</a>.</p>
-            <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p>
+            <!-- <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/">Pinterest</a>.</p>
+            <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p> -->
           </div>
 
         </div>
