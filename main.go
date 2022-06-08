@@ -41,6 +41,7 @@ func main() {
 
 	app.Get("/", indexHandler)
 	app.Get("/redirect", pinterestRedirectHandler)
+	app.Get("/privacy", privacyHandler)
 
 	// 404 handler.
 	app.Use(func(c *fiber.Ctx) error {
@@ -59,4 +60,8 @@ func main() {
 
 	// Start server on http://${heroku-url}:${port}
 	app.Listen(":" + port)
+}
+
+func privacyHandler(c *fiber.Ctx) error {
+	return c.SendString("Pinhuffle only stores a cookies for login info and the selected theme.")
 }
