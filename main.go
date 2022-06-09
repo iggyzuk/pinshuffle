@@ -71,6 +71,8 @@ func indexHandler(c *fiber.Ctx) error {
 		OAuthURL:      client.GetAuthUri(),
 		Authenticated: false,
 		Boards:        nil,
+		Error:         "",
+		Message:       "",
 	}
 
 	accessTokenCookie := new(fiber.Cookie)
