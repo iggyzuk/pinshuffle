@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
+	"github.com/joho/godotenv"
 )
 
 // TemplateData is the main object we pass for templating HTML
@@ -31,10 +32,15 @@ var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
 
 func main() {
 
+	godotenv.Load(".env")
+
 	client = NewClient(os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"))
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
+
+	// Delims sets the action delimiters to the specified strings
+	engine.Delims("{{", "}}") // Optional. Default: engine delimiters
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -75,18 +81,11 @@ func indexHandler(c *fiber.Ctx) error {
 		Message:       "",
 	}
 
-	accessTokenCookie := new(fiber.Cookie)
-	accessTokenCookie.Name = "access_token"
-	accessTokenCookie.Value = "access_token"
-	accessTokenCookie.Expires = time.Now().Add(24 * time.Hour)
-
-	c.Cookie(accessTokenCookie)
-
-	if c.Cookies(accessTokenCookie.Name) == "" {
+	if c.Cookies("access_token") == "" {
 		log.Println("Missing Cookie")
 	} else {
 		log.Println("Cookie Exists")
-		client.AccessToken = accessTokenCookie.Value
+		client.AccessToken = c.Cookies("access_token")
 		templateData.Authenticated = true
 
 		var templateBoards []TemplateBoard
