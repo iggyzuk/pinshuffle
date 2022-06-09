@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -104,7 +105,13 @@ func (client *PinterestClient) FetchAuthToken(codeKey string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 	req.SetBasicAuth(client.AppID, client.Secret)
+
+	// Authorization: Basic {base64 encoded string made of client_id:client_secret}
+	authData := client.AppID + ":" + client.Secret
+	authDataBase64 := base64.StdEncoding.EncodeToString([]byte(authData))
+	req.Header.Set("Authorization", authDataBase64)
 
 	resp, err := client.HttpClient.Do(req)
 	if err != nil {
