@@ -111,7 +111,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 	// A redirect URI such as https://www.example.com/oauth/pinterest/oauth_response/
 	// 		will result in a callback request like: https://www.example.com/oauth/pinterest/oauth_response/?code={CODE}&state={YOUR_OPTIONAL_STRING}
 
-	codeKey := c.FormValue("code")
+	codeKey := c.Query("code")
 
 	if len(codeKey) > 0 {
 		log.Println("Code Key: " + codeKey)
