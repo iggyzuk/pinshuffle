@@ -77,17 +77,17 @@
     </div>
     {{ end }}
 
-    <div class="grid">
+    {{/* <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
         <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
         <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/img/pin.png"/></a>
       </div>
       {{ end }}
-    </div>
+    </div> */}}
 
     <!-- Bottom buttons -->
-    <div class="fixed-bottom content p-1">
+    {{/* <div class="fixed-bottom content p-1">
       <div>
         <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#info-modal">ⓘ Info</button>
 
@@ -95,7 +95,7 @@
 
         <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ .TotalBoards }}</span></button>
       </div>
-    </div>
+    </div> */}}
 
   </div>
 
@@ -130,14 +130,14 @@
               <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
               {{ end }}
 
-              {{ if len ( .FollowedBoards ) }}
+              {{/* {{ if len ( .FollowedBoards ) }}
               <div class="list-group-item bg-success">Followed Boards:</div>
               {{ end }}
 
               {{ range .FollowedBoards }}
               <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
               <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
-              {{ end }}
+              {{ end }} */}}
 
             </div>
 

@@ -40,24 +40,24 @@ Packery.prototype.shuffle = function(){
     this.layout();
 }
 
-// // init
-// $(function () {
+// init
+$(function () {
 
-//   applyThemeFromCookie();
+  applyThemeFromCookie();
 
-//   // init packery
-//   var pckry = $('.grid').packery({
-//     itemSelector: '.grid-item',
-//   });
+  // init packery
+  var pckry = $('.grid').packery({
+    itemSelector: '.grid-item',
+  });
 
-//   // on click -> zoom element
-//   pckry.on( 'click', '.grid-image', function( event ) {
-//     $(event.currentTarget.parentNode).toggleClass('grid-item--large');
-//     pckry.packery('layout');
-//   });
+  // on click -> zoom element
+  pckry.on( 'click', '.grid-image', function( event ) {
+    $(event.currentTarget.parentNode).toggleClass('grid-item--large');
+    pckry.packery('layout');
+  });
 
-//   // on click -> shuffle all elements
-//   document.querySelector('#shuffle-button').onclick = function() {
-//     pckry.packery('shuffle');
-//   };
-// });
+  // on click -> shuffle all elements
+  document.querySelector('#shuffle-button').onclick = function() {
+    pckry.packery('shuffle');
+  };
+});

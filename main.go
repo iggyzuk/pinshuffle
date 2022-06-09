@@ -14,7 +14,14 @@ import (
 type TemplateData struct {
 	OAuthURL      string
 	Authenticated bool
-	BoardCount    int
+	Boards        []TemplateBoard
+	Error         string
+	Message       string
+}
+
+type TemplateBoard struct {
+	Name     string
+	PinCount int
 }
 
 var client *PinterestClient
@@ -63,7 +70,7 @@ func indexHandler(c *fiber.Ctx) error {
 	templateData := TemplateData{
 		OAuthURL:      client.GetAuthUri(),
 		Authenticated: false,
-		BoardCount:    0,
+		Boards:        nil,
 	}
 
 	accessTokenCookie := new(fiber.Cookie)
@@ -79,7 +86,15 @@ func indexHandler(c *fiber.Ctx) error {
 		log.Println("Cookie Exists")
 		client.AccessToken = accessTokenCookie.Value
 		templateData.Authenticated = true
-		templateData.BoardCount = len(client.FetchBoards().Items)
+
+		var templateBoards []TemplateBoard
+		for _, b := range client.FetchBoards().Items {
+			templateBoards = append(templateBoards, TemplateBoard{
+				Name:     b.Name,
+				PinCount: 16, // TODO: is this still possible?
+			})
+		}
+		templateData.Boards = templateBoards
 	}
 
 	// Render the HTML page.
