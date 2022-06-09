@@ -116,7 +116,11 @@ func authRedirectHandler(c *fiber.Ctx) error {
 	if len(codeKey) > 0 {
 		log.Println("Code Key: " + codeKey)
 
-		client.FetchAuthToken(codeKey)
+		err := client.FetchAuthToken(codeKey)
+
+		if err != nil {
+			return err
+		}
 
 		cookie := fiber.Cookie{
 			Name:    "access_token",
