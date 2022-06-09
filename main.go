@@ -132,7 +132,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 
 		log.Println("Success! Go back home!")
 
-		c.Redirect(client.BaseURL)
+		c.Redirect(client.MainURL)
 	}
 
 	return nil
