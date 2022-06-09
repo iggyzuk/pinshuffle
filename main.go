@@ -13,7 +13,7 @@ import (
 // TemplateData is the main object we pass for templating HTML
 type TemplateData struct {
 	OAuthURL      string
-	Authanticated bool
+	Authenticated bool
 	BoardCount    int
 }
 
@@ -60,9 +60,9 @@ func main() {
 
 func indexHandler(c *fiber.Ctx) error {
 
-	tmplData := TemplateData{
+	templateData := TemplateData{
 		OAuthURL:      client.GetAuthUri(),
-		Authanticated: false,
+		Authenticated: false,
 		BoardCount:    0,
 	}
 
@@ -78,12 +78,12 @@ func indexHandler(c *fiber.Ctx) error {
 	} else {
 		log.Println("Cookie Exists")
 		client.AccessToken = accessTokenCookie.Value
-		tmplData.Authanticated = true
-		tmplData.BoardCount = len(client.FetchBoards().Items)
+		templateData.Authenticated = true
+		templateData.BoardCount = len(client.FetchBoards().Items)
 	}
 
 	// Render the HTML page.
-	return c.Render("layout", tmplData)
+	return c.Render("layout", templateData)
 }
 
 func authRedirectHandler(c *fiber.Ctx) error {
