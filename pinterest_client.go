@@ -14,6 +14,7 @@ import (
 type PinterestClient struct {
 	AppID              string
 	Secret             string
+	MainURL            string
 	BaseURL            string
 	RedirectUri        string
 	Scopes             string
@@ -68,6 +69,7 @@ func NewClient(id string, secret string) *PinterestClient {
 	return &PinterestClient{
 		AppID:       "1478247",
 		Secret:      "f40d064f73aaeabe98596eb9b409162742d36b69",
+		MainURL:     "https://pinshuffle.herokuapp.com/",
 		BaseURL:     "https://api.pinterest.com/v5",
 		RedirectUri: "https://pinshuffle.herokuapp.com/redirect/",
 		Scopes:      "boards:read,pins:read",
@@ -89,10 +91,17 @@ func (client *PinterestClient) FetchAuthToken(codeKey string) error {
 	// to our access token endpoint with a request body and content type of
 	// application/x-www-form-urlencoded: https://api.pinterest.com/v5/oauth/token
 
+	// curl -X POST https://api.pinterest.com/v5/oauth/token
+	// --header 'Authorization: Basic {base64 encoded string made of client_id:client_secret}'
+	// --header 'Content-Type: application/x-www-form-urlencoded'
+	// --data-urlencode 'grant_type=authorization_code'
+	// --data-urlencode 'code={YOUR_CODE}'
+	// --data-urlencode 'redirect_uri=http://localhost/'
+
 	body, _ := json.Marshal(map[string]string{
-		"code":         codeKey,
-		"redirect_uri": client.RedirectUri,
 		"grant_type":   "authorization_code",
+		"code":         codeKey,
+		"redirect_uri": client.MainURL,
 	})
 
 	responseBody := bytes.NewBuffer(body)
