@@ -77,7 +77,7 @@ func NewClient(id string, secret string) *PinterestClient {
 		MainURL:     "https://pinshuffle.herokuapp.com/",
 		BaseURL:     "https://api.pinterest.com/v5",
 		RedirectUri: "https://pinshuffle.herokuapp.com/redirect/",
-		Scopes:      "boards:read,pins:read",
+		Scopes:      "user_accounts:read,boards:read,pins:read",
 		HttpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -117,19 +117,22 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 		return err
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 	req.SetBasicAuth(client.AppID, client.Secret)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.HttpClient.Do(req)
 	if err != nil {
 		return err
 	}
 
+	defer resp.Body.Close()
+
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("%s\n", string(bytes))
 
 	var accessTokenData AccessTokenData
 	unmarshalErr := json.Unmarshal(bytes, &accessTokenData)
