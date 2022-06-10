@@ -73,8 +73,8 @@ type Image struct {
 func NewClient(id string, secret string) *PinterestClient {
 
 	return &PinterestClient{
-		AppID:       "1478247",
-		Secret:      "f40d064f73aaeabe98596eb9b409162742d36b69",
+		AppID:       id,
+		Secret:      secret,
 		MainURL:     "https://pinshuffle.herokuapp.com/",
 		BaseURL:     "https://api.pinterest.com/v5",
 		RedirectUri: "https://pinshuffle.herokuapp.com/redirect/",

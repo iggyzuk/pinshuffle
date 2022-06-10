@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
 )
@@ -33,6 +35,8 @@ func main() {
 
 	client = NewClient(os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"))
 
+	fmt.Printf("Pinterest Client: %+v", client)
+
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
 
@@ -44,6 +48,7 @@ func main() {
 	})
 
 	app.Use(logger.New())
+	app.Use("/monitor", monitor.New())
 
 	// Load static files like CSS, Images & JavaScript.
 	app.Static("/static", "./static")
