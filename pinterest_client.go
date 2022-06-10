@@ -78,7 +78,7 @@ func NewClient(id string, secret string) *PinterestClient {
 		MainURL:     "https://pinshuffle.herokuapp.com/",
 		BaseURL:     "https://api.pinterest.com/v5",
 		RedirectUri: "https://pinshuffle.herokuapp.com/redirect/",
-		Scopes:      "user_accounts:read,boards:read,pins:read",
+		Scopes:      "boards:read,pins:read",
 		HttpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
