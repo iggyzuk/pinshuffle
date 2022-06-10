@@ -27,8 +27,8 @@ type TemplateBoard struct {
 
 var client *PinterestClient
 
-var tlsCertPath = os.Getenv("TLS_CERT_PATH")
-var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
+// var tlsCertPath = os.Getenv("TLS_CERT_PATH")
+// var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
 
 func main() {
 
@@ -118,7 +118,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 	if len(codeKey) > 0 {
 		log.Println("Code Key: " + codeKey)
 
-		err := client.FetchAuthToken(codeKey)
+		err := client.FetchAccessToken(codeKey)
 
 		if err != nil {
 			return err

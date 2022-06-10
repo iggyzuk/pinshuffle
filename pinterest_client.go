@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,8 +22,14 @@ type PinterestClient struct {
 	AccessToken        string
 }
 
-type AuthModel struct {
-	AccessToken string `json:"access_token"`
+type AccessTokenData struct {
+	AccessToken           string `json:"access_token"`
+	RefreshToken          string `json:"refresh_token"`
+	ResponseType          string `json:"response_type"`
+	TokenType             string `json:"token_type"`
+	ExpiresIn             int    `json:"expires_in"`
+	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in"`
+	Scope                 string `json:"scope"`
 }
 
 type Boards struct {
@@ -82,7 +89,7 @@ func (client *PinterestClient) GetAuthUri() string {
 	return "https://www.pinterest.com/oauth/?&client_id=" + client.AppID + "&redirect_uri=" + client.RedirectUri + "&response_type=code" + "&scope=" + client.Scopes
 }
 
-func (client *PinterestClient) FetchAuthToken(codeKey string) error {
+func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 
 	// Once you have received the code to your redirect URI,
 	// you can exchange it for an access token by making a POST request
@@ -124,13 +131,15 @@ func (client *PinterestClient) FetchAuthToken(codeKey string) error {
 		return err
 	}
 
-	var authModel AuthModel
-	unmarshalErr := json.Unmarshal(bytes, &authModel)
+	var accessTokenData AccessTokenData
+	unmarshalErr := json.Unmarshal(bytes, &accessTokenData)
 	if unmarshalErr != nil {
 		return unmarshalErr
 	}
 
-	client.AccessToken = authModel.AccessToken
+	fmt.Printf("Access Token: %+v", accessTokenData)
+
+	client.AccessToken = accessTokenData.AccessToken
 
 	return nil
 }
