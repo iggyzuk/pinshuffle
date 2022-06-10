@@ -22,7 +22,13 @@ type PinterestClient struct {
 	AccessToken        string
 }
 
-type AccessTokenData struct {
+type AccessTokenRequest struct {
+	GrantType   string `json:"grant_type"`
+	Code        string `json:"code"`
+	RedirectUri string `json:"redirect_uri"`
+}
+
+type AccessTokenResponse struct {
 	AccessToken           string `json:"access_token"`
 	RefreshToken          string `json:"refresh_token"`
 	ResponseType          string `json:"response_type"`
@@ -89,12 +95,6 @@ func (client *PinterestClient) GetAuthUri() string {
 	return "https://www.pinterest.com/oauth/?&client_id=" + client.AppID + "&redirect_uri=" + client.RedirectUri + "&response_type=code" + "&scope=" + client.Scopes
 }
 
-type AccessTokenBodyData struct {
-	GrantType   string `json:"grant_type"`
-	Code        string `json:"code"`
-	RedirectUri string `json:"redirect_uri"`
-}
-
 func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 
 	// Once you have received the code to your redirect URI,
@@ -115,42 +115,42 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// 	"grant_type":   "authorization_code",
 	// })
 
-	bodyData, err := json.Marshal(&AccessTokenBodyData{
+	accessTokenRequest := &AccessTokenRequest{
 		GrantType:   "authorization_code",
 		Code:        codeKey,
 		RedirectUri: client.MainURL,
-	})
+	}
+
+	bodyBytes, err := json.Marshal(accessTokenRequest)
 
 	if err != nil {
 		return err
 	}
 
-	responseBody := bytes.NewBuffer(bodyData)
-
-	req, err := http.NewRequest("POST", "https://api.pinterest.com/v5/oauth/token", responseBody)
+	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewReader(bodyBytes))
 
 	if err != nil {
 		return err
 	}
 
-	req.SetBasicAuth(client.AppID, client.Secret)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.SetBasicAuth(client.AppID, client.Secret)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := client.HttpClient.Do(req)
+	response, err := client.HttpClient.Do(request)
 	if err != nil {
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("%s\n", string(bytes))
 
-	var accessTokenData AccessTokenData
+	var accessTokenData AccessTokenResponse
 	unmarshalErr := json.Unmarshal(bytes, &accessTokenData)
 	if unmarshalErr != nil {
 		return unmarshalErr
@@ -175,7 +175,7 @@ func (client *PinterestClient) GetHeader() http.Header {
 }
 
 func (client *PinterestClient) ExecuteRequest(endpoint string) []byte {
-	req, err := http.NewRequest("GET", client.Endpoint(endpoint), nil)
+	req, err := http.NewRequest(http.MethodGet, client.Endpoint(endpoint), nil)
 
 	if err != nil {
 		log.Fatal(err)
