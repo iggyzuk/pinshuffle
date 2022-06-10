@@ -121,13 +121,15 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 		RedirectUri: client.MainURL,
 	}
 
-	bodyBytes, err := json.Marshal(accessTokenRequest)
+	requestBytes, err := json.Marshal(accessTokenRequest)
+
+	fmt.Printf("Request: %s\n", string(requestBytes))
 
 	if err != nil {
 		return err
 	}
 
-	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewReader(bodyBytes))
+	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBuffer(requestBytes))
 
 	if err != nil {
 		return err
@@ -143,15 +145,15 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 
 	defer response.Body.Close()
 
-	bytes, err := ioutil.ReadAll(response.Body)
+	responseBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s\n", string(bytes))
+	fmt.Printf("Response: %s\n", string(responseBytes))
 
 	var accessTokenData AccessTokenResponse
-	unmarshalErr := json.Unmarshal(bytes, &accessTokenData)
+	unmarshalErr := json.Unmarshal(responseBytes, &accessTokenData)
 	if unmarshalErr != nil {
 		return unmarshalErr
 	}
