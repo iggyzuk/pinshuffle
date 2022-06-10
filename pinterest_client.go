@@ -129,7 +129,7 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// 	return err
 	// }
 
-	body := "grant_type=authorization_code,code=" + codeKey + ",redirect_uri=" + client.MainURL
+	body := "grant_type=authorization_code&code=" + codeKey + "&redirect_uri=" + client.MainURL
 
 	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBufferString(body))
 
