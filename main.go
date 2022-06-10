@@ -53,6 +53,7 @@ func main() {
 
 	app.Get("/", indexHandler)
 	app.Get("/redirect", authRedirectHandler)
+	app.Get("/privacy", privacyHandler)
 
 	// 404 handler.
 	app.Use(func(c *fiber.Ctx) error {
@@ -140,4 +141,8 @@ func authRedirectHandler(c *fiber.Ctx) error {
 	}
 
 	return nil
+}
+
+func privacyHandler(c *fiber.Ctx) error {
+	return c.SendString("Pinshuffle uses a cookie for the access token and the selected theme.")
 }
