@@ -27,9 +27,6 @@ type TemplateBoard struct {
 
 var client *PinterestClient
 
-// var tlsCertPath = os.Getenv("TLS_CERT_PATH")
-// var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
-
 func main() {
 
 	godotenv.Load(".env")
