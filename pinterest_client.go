@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 )
 
@@ -20,12 +21,6 @@ type PinterestClient struct {
 	HttpClient         *http.Client
 	DefaultContentType string
 	AccessToken        string
-}
-
-type AccessTokenRequest struct {
-	GrantType   string `json:"grant_type"`
-	Code        string `json:"code"`
-	RedirectUri string `json:"redirect_uri"`
 }
 
 type AccessTokenResponse struct {
@@ -109,29 +104,16 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// --data-urlencode 'code={YOUR_CODE}'
 	// --data-urlencode 'redirect_uri=http://localhost/'
 
-	// body, _ := json.Marshal(map[string]string{
-	// 	"code":         codeKey,
-	// 	"redirect_uri": client.MainURL,
-	// 	"grant_type":   "authorization_code",
-	// })
+	data := url.Values{}
+	data.Add("grant_type", "authorization_code")
+	data.Add("redirect_uri", client.MainURL)
+	data.Add("code", codeKey)
 
-	// accessTokenRequest := &AccessTokenRequest{
-	// 	GrantType:   "authorization_code",
-	// 	Code:        codeKey,
-	// 	RedirectUri: client.MainURL,
-	// }
-
-	// requestBytes, err := json.Marshal(accessTokenRequest)
-
-	// fmt.Printf("Request: %s\n", string(requestBytes))
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	body := "grant_type=authorization_code&redirect_uri=" + client.MainURL + "&code=" + codeKey
-
-	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBufferString(body))
+	request, err := http.NewRequest(
+		http.MethodPost,
+		"https://api.pinterest.com/v5/oauth/token",
+		strings.NewReader(data.Encode()),
+	)
 
 	if err != nil {
 		return err
