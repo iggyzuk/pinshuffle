@@ -115,21 +115,23 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// 	"grant_type":   "authorization_code",
 	// })
 
-	accessTokenRequest := &AccessTokenRequest{
-		GrantType:   "authorization_code",
-		Code:        codeKey,
-		RedirectUri: client.MainURL,
-	}
+	// accessTokenRequest := &AccessTokenRequest{
+	// 	GrantType:   "authorization_code",
+	// 	Code:        codeKey,
+	// 	RedirectUri: client.MainURL,
+	// }
 
-	requestBytes, err := json.Marshal(accessTokenRequest)
+	// requestBytes, err := json.Marshal(accessTokenRequest)
 
-	fmt.Printf("Request: %s\n", string(requestBytes))
+	// fmt.Printf("Request: %s\n", string(requestBytes))
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBufferString("grant_type=authorization_code")) //bytes.NewBuffer(requestBytes))
+	body := "grant_type=authorization_code code=" + codeKey + " redirect_uri=" + client.MainURL
+
+	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBufferString(body))
 
 	if err != nil {
 		return err
