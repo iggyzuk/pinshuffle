@@ -81,11 +81,13 @@ func indexHandler(c *fiber.Ctx) error {
 		Message:       "",
 	}
 
-	if c.Cookies("access_token") == "" {
+	var cookie = c.Cookies("access_token")
+
+	if len(cookie) == 0 {
 		log.Println("Missing Cookie")
 	} else {
 		log.Println("Cookie Exists")
-		client.AccessToken = c.Cookies("access_token")
+		client.AccessToken = cookie
 		templateData.Authenticated = true
 
 		var templateBoards []TemplateBoard
@@ -129,6 +131,8 @@ func authRedirectHandler(c *fiber.Ctx) error {
 		}
 
 		c.Cookie(&cookie)
+
+		log.Printf("Cookie: %s, value: %s", cookie.Name, cookie.Value)
 
 		log.Println("Success! Go back home!")
 

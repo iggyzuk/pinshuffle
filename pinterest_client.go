@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 type PinterestClient struct {
@@ -133,12 +131,6 @@ func (client *PinterestClient) FetchAuthToken(codeKey string) error {
 	}
 
 	client.AccessToken = authModel.AccessToken
-
-	// Save cookie with auth token.
-	accessTokenCookie := new(fiber.Cookie)
-	accessTokenCookie.Name = "access_token"
-	accessTokenCookie.Value = client.AccessToken
-	accessTokenCookie.Expires = time.Now().Add(24 * time.Hour)
 
 	return nil
 }
