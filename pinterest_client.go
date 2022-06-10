@@ -89,6 +89,12 @@ func (client *PinterestClient) GetAuthUri() string {
 	return "https://www.pinterest.com/oauth/?&client_id=" + client.AppID + "&redirect_uri=" + client.RedirectUri + "&response_type=code" + "&scope=" + client.Scopes
 }
 
+type AccessTokenBodyData struct {
+	Code        string `json:"code"`
+	RedirectUri string `json:"redirect_uri"`
+	GrantType   string `json:"grant_type"`
+}
+
 func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 
 	// Once you have received the code to your redirect URI,
@@ -103,13 +109,23 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// --data-urlencode 'code={YOUR_CODE}'
 	// --data-urlencode 'redirect_uri=http://localhost/'
 
-	body, _ := json.Marshal(map[string]string{
-		"code":         codeKey,
-		"redirect_uri": client.MainURL,
-		"grant_type":   "authorization_code",
+	// body, _ := json.Marshal(map[string]string{
+	// 	"code":         codeKey,
+	// 	"redirect_uri": client.MainURL,
+	// 	"grant_type":   "authorization_code",
+	// })
+
+	bodyData, err := json.Marshal(&AccessTokenBodyData{
+		Code:        codeKey,
+		RedirectUri: client.MainURL,
+		GrantType:   "authorization_code",
 	})
 
-	responseBody := bytes.NewBuffer(body)
+	if err != nil {
+		return err
+	}
+
+	responseBody := bytes.NewBuffer(bodyData)
 
 	req, err := http.NewRequest("POST", "https://api.pinterest.com/v5/oauth/token", responseBody)
 
