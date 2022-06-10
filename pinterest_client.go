@@ -104,8 +104,8 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// --data-urlencode 'redirect_uri=http://localhost/'
 
 	body, _ := json.Marshal(map[string]string{
-		"grant_type":   "authorization_code",
 		"code":         codeKey,
+		"grant_type":   "authorization_code",
 		"redirect_uri": client.MainURL,
 	})
 
@@ -118,7 +118,7 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	}
 
 	req.SetBasicAuth(client.AppID, client.Secret)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.HttpClient.Do(req)
 	if err != nil {
