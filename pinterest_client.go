@@ -129,7 +129,7 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 		return err
 	}
 
-	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBuffer(requestBytes))
+	request, err := http.NewRequest(http.MethodPost, "https://api.pinterest.com/v5/oauth/token", bytes.NewBufferString("grant_type=authorization_code")) //bytes.NewBuffer(requestBytes))
 
 	if err != nil {
 		return err
