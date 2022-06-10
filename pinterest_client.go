@@ -90,9 +90,9 @@ func (client *PinterestClient) GetAuthUri() string {
 }
 
 type AccessTokenBodyData struct {
+	GrantType   string `json:"grant_type"`
 	Code        string `json:"code"`
 	RedirectUri string `json:"redirect_uri"`
-	GrantType   string `json:"grant_type"`
 }
 
 func (client *PinterestClient) FetchAccessToken(codeKey string) error {
@@ -116,9 +116,9 @@ func (client *PinterestClient) FetchAccessToken(codeKey string) error {
 	// })
 
 	bodyData, err := json.Marshal(&AccessTokenBodyData{
+		GrantType:   "authorization_code",
 		Code:        codeKey,
 		RedirectUri: client.MainURL,
-		GrantType:   "authorization_code",
 	})
 
 	if err != nil {
