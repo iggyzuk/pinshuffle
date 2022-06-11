@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -175,7 +176,16 @@ func (client *PinterestClient) ExecuteRequest(endpoint string) ([]byte, error) {
 	}
 
 	if resp.StatusCode > 200 {
-		return nil, errors.New("⚠️ " + resp.Status)
+
+		defer resp.Body.Close()
+
+		b, err := io.ReadAll(resp.Body)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, errors.New("⚠️ " + string(b))
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
