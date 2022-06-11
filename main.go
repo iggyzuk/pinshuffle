@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"time"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -13,21 +12,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TemplateData is the main object we pass for templating HTML
-type TemplateData struct {
-	OAuthURL      string
-	Authenticated bool
-	Boards        []TemplateBoard
-	Error         string
-	Message       string
-}
-
-type TemplateBoard struct {
-	Name     string
-	PinCount int
-}
-
 var client *PinterestClient
+var tm *TemplateModel
+var randomizer *Randomizer
 
 func main() {
 
@@ -39,6 +26,8 @@ func main() {
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
+	engine.AddFunc("upper", strings.ToUpper)
+	engine.AddFunc("isBoardSelected", IsBoardSelected)
 
 	// Delims sets the action delimiters to the specified strings
 	engine.Delims("{{", "}}") // Optional. Default: engine delimiters
@@ -72,79 +61,4 @@ func main() {
 
 	// Start server on http://${heroku-url}:${port}
 	app.Listen(":" + port)
-}
-
-func indexHandler(c *fiber.Ctx) error {
-
-	templateData := TemplateData{
-		OAuthURL:      client.GetAuthUri(),
-		Authenticated: false,
-		Boards:        nil,
-		Error:         "",
-		Message:       "",
-	}
-
-	var cookie = c.Cookies("access_token")
-
-	if len(cookie) == 0 {
-		log.Println("Missing Cookie")
-	} else {
-		log.Println("Cookie Exists")
-		client.AccessToken = cookie
-		templateData.Authenticated = true
-
-		var templateBoards []TemplateBoard
-		for _, b := range client.FetchBoards().Items {
-			templateBoards = append(templateBoards, TemplateBoard{
-				Name:     b.Name,
-				PinCount: 16, // TODO: is this still possible?
-			})
-		}
-		templateData.Boards = templateBoards
-	}
-
-	// Render the HTML page.
-	return c.Render("layout", templateData)
-}
-
-func authRedirectHandler(c *fiber.Ctx) error {
-
-	// Once the user approves authorization for your app, they will be sent to your redirect URI as indicated in the request.
-	// 		We will add the following parameters as we make the call to your redirect URI:
-	//			code: This is the code you will use in the next step to exchange for an access token.
-	//			state: This is the optional parameter to prevent cross-site request forgery. Check to make sure it matches what was passed in the first step of the flow. If it does not, the exchange may have been subject to a cross-site request forgery attack.
-	// A redirect URI such as https://www.example.com/oauth/pinterest/oauth_response/
-	// 		will result in a callback request like: https://www.example.com/oauth/pinterest/oauth_response/?code={CODE}&state={YOUR_OPTIONAL_STRING}
-
-	codeKey := c.Query("code")
-
-	if len(codeKey) > 0 {
-		log.Println("Code Key: " + codeKey)
-
-		err := client.FetchAccessToken(codeKey)
-
-		if err != nil {
-			return err
-		}
-
-		cookie := fiber.Cookie{
-			Name:    "access_token",
-			Value:   client.AccessToken,
-			Expires: time.Now().Add(365 * 24 * time.Hour),
-		}
-
-		c.Cookie(&cookie)
-
-		log.Printf("Cookie: %s, value: %s", cookie.Name, cookie.Value)
-
-		log.Println("Success! Go back home!")
-
-		c.Redirect(client.MainURL)
-	}
-
-	return nil
-}
-
-func privacyHandler(c *fiber.Ctx) error {
-	return c.SendString("Pinshuffle uses a cookie for the access token and the selected theme.")
 }

@@ -56,8 +56,8 @@ $(function () {
     pckry.packery('layout');
   });
 
-  // // on click -> shuffle all elements
-  // document.querySelector('#shuffle-button').onclick = function() {
-  //   pckry.packery('shuffle');
-  // };
+  // on click -> shuffle all elements
+  document.querySelector('#shuffle-button').onclick = function() {
+    pckry.packery('shuffle');
+  };
 });

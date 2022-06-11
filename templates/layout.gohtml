@@ -68,12 +68,13 @@
     {{ if .Error }}
     <div class="alert alert-danger alert-dismissible fade show">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      {{ .Error }}
+      {{ upper .Error }}
     </div>
-    {{ else if .Message }}
+    {{ end }}
+    {{ if .Message }}
     <div class="alert alert-primary alert-dismissible fade show">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      {{ .Message }}
+      {{ upper .Message }}
     </div>
     {{ end }}
 
@@ -87,15 +88,15 @@
     </div> */}}
 
     <!-- Bottom buttons -->
-    {{/* <div class="fixed-bottom content p-1">
+    <div class="fixed-bottom content p-1">
       <div>
         <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#info-modal">ⓘ Info</button>
 
         <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
 
-        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ .TotalBoards }}</span></button>
+        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
       </div>
-    </div> */}}
+    </div> 
 
   </div>
 
@@ -126,8 +127,8 @@
               {{ end }}
 
               {{ range .Boards }}
-              <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
-              <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
+              <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if isBoardSelected (.Id) }} checked {{ end }}/> 
+              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCount }}</span></label>
               {{ end }}
 
               {{/* {{ if len ( .FollowedBoards ) }}
@@ -135,8 +136,8 @@
               {{ end }}
 
               {{ range .FollowedBoards }}
-              <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
-              <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
+              <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" />
+              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
               {{ end }} */}}
 
             </div>
@@ -156,7 +157,7 @@
             max="10000"
             type="text"
             placeholder="Total Pins"
-            value="100" />
+            value={{.UrlQuery.Max}} />
 
           <!-- Submit the form -->
           <button type="submit" class="btn btn-danger">Go!</button>
