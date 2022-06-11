@@ -1,9 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
+	"sort"
 	"strconv"
 
 	"github.com/valyala/fasthttp"
@@ -19,12 +19,12 @@ type TemplateModel struct {
 	Error         string
 	Message       string
 	UrlQuery      *TemplateUrlQuery
+	ImageSize     int
 }
 
 type TemplateBoard struct {
-	Board *Board
-	Name  string
-	Id    string
+	Name string
+	Id   string
 }
 
 type TemplatePin struct {
@@ -34,8 +34,9 @@ type TemplatePin struct {
 }
 
 type TemplateUrlQuery struct {
-	Max    int
-	Boards []string
+	Boards    []string
+	Max       int
+	ImageSize int
 }
 
 func NewTemplateModel(authUrl string) *TemplateModel {
@@ -47,6 +48,7 @@ func NewTemplateModel(authUrl string) *TemplateModel {
 		Error:         "",
 		Message:       "",
 		UrlQuery:      &TemplateUrlQuery{},
+		ImageSize:     3,
 	}
 }
 
@@ -109,26 +111,39 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
 	if queryMap["b"] != nil {
 		for _, boardId := range queryMap["b"] {
 
-			board, err := tm.FindBoardWithId(boardId)
-			if err != nil {
-				return err
+			board, exists := clientBoards[boardId]
+			if exists {
+				tm.UrlQuery.Boards = append(tm.UrlQuery.Boards, board.Id)
 			}
-
-			tm.UrlQuery.Boards = append(tm.UrlQuery.Boards, board.Id)
-
 		}
 	}
 
-	fmt.Printf("TemplateQuery: %+v", tm.UrlQuery)
+	fmt.Printf("Query: %+v \n", tm.UrlQuery)
+
+	for _, val := range clientBoards {
+		tm.Boards = append(tm.Boards, TemplateBoard{
+			Id:   val.Id,
+			Name: val.Name,
+		})
+
+		fmt.Printf("Board: %+v \n", val)
+	}
+
+	sort.SliceStable(tm.Boards, func(i, j int) bool {
+		return tm.Boards[i].Name < tm.Boards[j].Name
+	})
+
+	// Images.
+	if queryMap["is"] != nil {
+		maxString := queryMap["is"][0]
+		imageSizeInt, err := strconv.Atoi(maxString)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			tm.UrlQuery.ImageSize = imageSizeInt
+		}
+	}
 
 	return nil
-}
-
-func (tm *TemplateModel) FindBoardWithId(id string) (*TemplateBoard, error) {
-	for _, i := range tm.Boards {
-		if i.Id == id {
-			return &i, nil
-		}
-	}
-	return nil, errors.New("No board with id: " + id)
 }

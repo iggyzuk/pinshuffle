@@ -3,7 +3,6 @@ module pinshuffle
 go 1.18
 
 require (
-	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/gofiber/fiber/v2 v2.34.0
 	github.com/gofiber/template v1.6.6
 	github.com/joho/godotenv v1.4.0

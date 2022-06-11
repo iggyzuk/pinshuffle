@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -15,18 +16,18 @@ func NewRandomizer() *Randomizer {
 	return &Randomizer{}
 }
 
-func (rnd *Randomizer) GetRandomizedPins(tm *TemplateModel) []Pin {
+func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) []Pin {
 	rand.Seed(time.Now().UnixNano())
-	rnd.Max = tm.UrlQuery.Max
-	rnd.ProccessBoards(tm.UrlQuery)
+	rnd.Max = max
+	rnd.ProccessBoards(boardIds)
 	return rnd.FetchAllPinsFromSelectedBoards()
 }
 
-func (rnd *Randomizer) ProccessBoards(urlQueryModel *TemplateUrlQuery) {
-	for _, queryBoard := range urlQueryModel.Boards {
-		rnd.BoardIds = append(rnd.BoardIds, queryBoard)
-	}
+func (rnd *Randomizer) ProccessBoards(boardIds []string) {
+	rnd.BoardIds = boardIds
+
 	boardCount := len(rnd.BoardIds)
+
 	if boardCount > 0 {
 		rnd.PinsPerBoard = rnd.Max / boardCount
 	}
@@ -34,34 +35,41 @@ func (rnd *Randomizer) ProccessBoards(urlQueryModel *TemplateUrlQuery) {
 
 func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 
-	ch := make(chan []Pin)
+	wg := sync.WaitGroup{}
+	pins := []Pin{}
 
-	for _, tb := range tm.Boards {
-		go rnd.FetchPinsFromBoard(tb.Board, ch)
+	for _, boardId := range rnd.BoardIds {
+		id := boardId
+
+		go func() {
+			newPins := rnd.FetchPinsFromBoard(clientBoards[id])
+			pins = append(pins, newPins...)
+			wg.Done()
+		}()
+
+		wg.Add(1)
 	}
 
-	pins := []Pin{}
-	newPins := <-ch
-	pins = append(pins, newPins...)
+	wg.Wait()
 
 	return pins
 }
 
-func (rnd *Randomizer) FetchPinsFromBoard(board *Board, ch chan []Pin) {
+func (rnd *Randomizer) FetchPinsFromBoard(board *Board) []Pin {
 	allPins := client.FetchAllPins(board)
 	trimmedPins := rnd.Trim(allPins, rnd.PinsPerBoard)
-	ch <- trimmedPins
+	return trimmedPins
 }
 
 func (rnd *Randomizer) Trim(pins []Pin, limit int) []Pin {
 	for len(pins) > limit {
-		return rnd.Remove(pins, rand.Intn(len(pins)))
+		pins = rnd.Remove(pins, rand.Intn(len(pins)))
 	}
 	return pins
 }
 
-func (rnd *Randomizer) Remove(s []Pin, i int) []Pin {
-	s[i] = s[len(s)-1]
+func (rnd *Randomizer) Remove(pins []Pin, i int) []Pin {
+	pins[i] = pins[len(pins)-1]
 	// We do not need to put s[i] at the end, as it will be discarded anyway
-	return s[:len(s)-1]
+	return pins[:len(pins)-1]
 }
