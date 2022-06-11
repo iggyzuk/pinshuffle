@@ -45,7 +45,7 @@
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">🃏 Shuffle Your Pinterest Boards</h4>
+            <h4 class="modal-title">♦️ Shuffle Your Pinterest Boards</h4>
           </div>
 
           <!-- Modal body -->
@@ -92,11 +92,11 @@
     <!-- Bottom buttons -->
     <div class="fixed-bottom content p-1">
       <div>
-        <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#info-modal">ⓘ Info</button>
+        <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#settings-modal">⚙️ Settings</button>
 
         <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
 
-        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
+        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">📒 Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
       </div>
     </div> 
 
@@ -113,7 +113,7 @@
 
         <!-- Board Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">⌗ Boards <span class="badge badge-secondary badge-pill">{{ len .Boards }}</span></h4>
+          <h4 class="modal-title">📒 Boards <span class="badge badge-secondary badge-pill">{{ len .Boards }}</span></h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
@@ -152,30 +152,34 @@
         </div>
 
         <!-- Board Modal Footer -->
-        <div class="modal-footer">
+        <div class="modal-footer float-none">
 
-          <input
-            class="form-control"
-            type="number"
-            name="max"
-            min="0"
-            max="10000"
-            type="text"
-            placeholder="Total Pins"
-            value={{.UrlQuery.Max}} />
+            <!-- Max Input -->
+            <label for="max">Max</label>
+            <input
+              id="max"
+              class="form-control"
+              type="number"
+              name="max"
+              min="0"
+              max="10000"
+              type="text"
+              placeholder="Total Pins"
+              value={{.UrlQuery.Max}} />
 
-          <input
-            class="form-control"
-            type="number"
-            name="is"
-            min="0"
-            max="3"
-            type="text"
-            placeholder="Image Size"
-            value={{.UrlQuery.ImageSize}} />
+            <label for="resolution">Resolution </label>
+
+            <!-- Resolution Input -->
+            <select class="form-control" id="res" name="res">
+              <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
+              <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
+              <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
+              <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
+              <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
+            </select>
 
           <!-- Submit the form -->
-          <button type="submit" class="btn btn-danger">Go!</button>
+          <button type="submit" class="btn btn-success">Go!</button>
 
         </div>
 
@@ -185,14 +189,14 @@
 
   </form>
 
-  <!-- Info Modal -->
-  <div class="modal fade" id="info-modal">
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settings-modal">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
 
         <!-- Modal header -->
         <div class="modal-header">
-          <h4 class="modal-title">ⓘ Info</h4>
+          <h4 class="modal-title">⚙️ Settings</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
@@ -200,15 +204,16 @@
         <div class="modal-body">
 
           <div class="content">
-            <p><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
+            <p><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> boards and shuffles them around. It does <b>not</b> modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
           </div>
 
           <hr class="my-4">
 
-          <div class="list-group">
-            <dl><h5>👁 Theme:</h5></dl>
-            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">Light</button>
-            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">Dark</button>
+          {{/* <dl><h5>👁 Theme:</h5></dl> */}}
+          
+          <div class="d-flex justify-content-center">
+              <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">🌝 Light</button>
+              <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">🌚 Dark</button>
           </div>
 
           <!-- Switch themes -->
@@ -223,8 +228,8 @@
           <hr class="my-4">
 
           <div class="content">
-            <dl><h5>🔒 Privacy:</h5></dl>
-            <p>Cookies for access token and selected theme</p>
+            {{/* <dl><h5>🔒 Privacy:</h5></dl> */}}
+            <p><b>Privacy:</b> Cookies for access token and the selected theme.</p>
           </div>
 
           <p class="small text-right">Made by <a href="https://twitter.com/IggyZuk/">Iggy Zuk</a></p>

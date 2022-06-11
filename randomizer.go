@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -56,7 +57,11 @@ func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 }
 
 func (rnd *Randomizer) FetchPinsFromBoard(board *Board) []Pin {
-	allPins := client.FetchAllPins(board)
+	fmt.Println("Fetching all pins from Board: " + board.Name)
+	allPins, err := client.FetchAllPins(board)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	trimmedPins := rnd.Trim(allPins, rnd.PinsPerBoard)
 	return trimmedPins
 }

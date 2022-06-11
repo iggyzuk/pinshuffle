@@ -18,22 +18,31 @@ func indexHandler(c *fiber.Ctx) error {
 
 	if len(cookie) == 0 {
 		log.Println("Missing Cookie")
-		tm.Message = "Waiting for access to Pinterest account."
+		tm.Message = "💭 Waiting for access to Pinterest account"
 		tm.Authenticated = false
 	} else {
 		log.Println("Cookie Exists")
 		client.AccessToken = cookie
 		tm.Authenticated = true
 
-		for _, board := range client.FetchBoards().Items {
-			clientBoards[board.Id] = &Board{Id: board.Id, Name: board.Name} // TODO: why do we need to copy it?
+		var fetchedClientBoards, err = client.FetchBoards()
+		if err != nil {
+			tm.Error = err.Error()
+		} else {
+			for _, board := range fetchedClientBoards.Items {
+				clientBoards[board.Id] = &Board{Id: board.Id, Name: board.Name} // TODO: why do we need to copy it? (probably cause it's an iterator value)
+			}
+		}
+
+		if len(clientBoards) == 0 {
+			tm.Message = "💭 No boards found"
 		}
 
 		// tm.Mock()
 
-		err := tm.ParseUrlQueries(c.Context().URI())
-		if err != nil {
-			return err
+		parseErr := tm.ParseUrlQueries(c.Context().URI())
+		if parseErr != nil {
+			return parseErr
 		}
 
 		if len(tm.UrlQuery.Boards) > 0 {
@@ -42,7 +51,7 @@ func indexHandler(c *fiber.Ctx) error {
 
 			for _, randomizedPin := range randomizedPins {
 				tm.Pins = append(tm.Pins, TemplatePin{
-					ImageURL: GetImageSize(tm.UrlQuery.ImageSize, randomizedPin.Media.Images).Url,
+					ImageURL: GetImageResolution(tm.UrlQuery.ImageResolution, randomizedPin.Media.Images).Url,
 					PinURL:   "#",
 					Color:    randomizedPin.Color,
 				})
@@ -52,20 +61,4 @@ func indexHandler(c *fiber.Ctx) error {
 
 	// Render the HTML page.
 	return c.Render("layout", tm)
-}
-
-func GetImageSize(imageSize int, images Images) Image {
-	if imageSize == 0 {
-		return images.Small
-	}
-	if imageSize == 1 {
-		return images.Medium
-	}
-	if imageSize == 2 {
-		return images.Huge
-	}
-	if imageSize == 3 {
-		return images.Original
-	}
-	return images.Medium
 }

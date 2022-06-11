@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -160,71 +160,88 @@ func (client *PinterestClient) GetHeader() http.Header {
 	}
 }
 
-func (client *PinterestClient) ExecuteRequest(endpoint string) []byte {
+func (client *PinterestClient) ExecuteRequest(endpoint string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, client.Endpoint(endpoint), nil)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	req.Header = client.GetHeader()
 
 	resp, err := client.HttpClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+
+	if resp.StatusCode > 200 {
+		return nil, errors.New("⚠️ " + resp.Status)
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return bytes
+	return bytes, nil
 }
 
-func (client *PinterestClient) FetchBoards() *Boards {
+func (client *PinterestClient) FetchBoards() (*Boards, error) {
 
-	bytes := client.ExecuteRequest("/boards?page_size=100")
+	bytes, err := client.ExecuteRequest("/boards?page_size=100")
+
+	if err != nil {
+		return nil, err
+	}
 
 	var boards = new(Boards)
 	unmarshalErr := json.Unmarshal(bytes, &boards)
 	if unmarshalErr != nil {
-		log.Fatal(unmarshalErr)
+		return nil, unmarshalErr
 	}
 
-	return boards
+	return boards, nil
 }
 
-func (client *PinterestClient) FetchAllPins(board *Board) []Pin {
+func (client *PinterestClient) FetchAllPins(board *Board) ([]Pin, error) {
 
 	var resultingPins []Pin
 
-	pins := client.FetchPage(board, "")
+	pins, err := client.FetchPage(board, "")
+	if err != nil {
+		return nil, err
+	}
 
 	resultingPins = append(resultingPins, pins.Items...)
 
 	for len(pins.Bookmark) > 0 {
-		pins = client.FetchPage(board, pins.Bookmark)
+		pins, err = client.FetchPage(board, pins.Bookmark)
+		if err != nil {
+			return nil, err
+		}
 		resultingPins = append(resultingPins, pins.Items...)
 	}
 
-	return resultingPins
+	return resultingPins, nil
 }
 
-func (client *PinterestClient) FetchPage(board *Board, bookmark string) *Pins {
+func (client *PinterestClient) FetchPage(board *Board, bookmark string) (*Pins, error) {
 
 	url := "/boards/" + board.Id + "/pins?page_size=100"
 	if len(bookmark) > 0 {
 		url += "&bookmark=" + bookmark
 	}
 
-	bytes := client.ExecuteRequest(url)
+	bytes, err := client.ExecuteRequest(url)
+	if err != nil {
+		return nil, err
+	}
 
 	var pins = new(Pins)
 	unmarshalErr := json.Unmarshal(bytes, &pins)
 	if unmarshalErr != nil {
-		log.Fatal(unmarshalErr)
+		return nil, unmarshalErr
 	}
 
-	return pins
+	return pins, nil
 }

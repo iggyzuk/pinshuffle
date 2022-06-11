@@ -34,9 +34,13 @@ type TemplatePin struct {
 }
 
 type TemplateUrlQuery struct {
-	Boards    []string
-	Max       int
-	ImageSize int
+	Boards          []string
+	Max             int
+	ImageResolution int
+}
+
+func IsBoardSelected(id string) bool {
+	return slices.Contains(tm.UrlQuery.Boards, id)
 }
 
 func NewTemplateModel(authUrl string) *TemplateModel {
@@ -55,11 +59,19 @@ func NewTemplateModel(authUrl string) *TemplateModel {
 func (tm *TemplateModel) Mock() {
 	tm.OAuthURL = ""
 	tm.Authenticated = true
-	tm.Boards = []TemplateBoard{
-		{Name: "Visual Style", Id: "visual-style"},
-		{Name: "Ideas", Id: "ideas"},
-		{Name: "Concepts", Id: "concepts"},
-	}
+
+	clientBoards["visual-style"] = &Board{Id: "visual-style", Name: "Visual Style"}
+	clientBoards["ideas"] = &Board{Id: "ideas", Name: "Ideas"}
+	clientBoards["concepts"] = &Board{Id: "concepts", Name: "Concepts"}
+
+	// ### You can override template board directly:
+
+	// tm.Boards = []TemplateBoard{
+	// 	{Name: "Visual Style", Id: "visual-style"},
+	// 	{Name: "Ideas", Id: "ideas"},
+	// 	{Name: "Concepts", Id: "concepts"},
+	// }
+
 	tm.Pins = []TemplatePin{
 		{ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", PinURL: "#", Color: "#000000"},
 		{ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif", PinURL: "#", Color: "#000000"},
@@ -74,13 +86,9 @@ func (tm *TemplateModel) Mock() {
 		{ImageURL: "https://iggyzuk.com/projects/game-engine/img/code.png", PinURL: "#", Color: "#000000"},
 		{ImageURL: "https://iggyzuk.com/projects/forest-monster/img/design/depth.jpg", PinURL: "#", Color: "#000000"},
 	}
-	tm.Error = "Mock Error!"
-	tm.Message = "Mock Message..."
+	// tm.Error = "Mock Error!"
+	// tm.Message = "Mock Message..."
 	// tm.UrlQuery = &TemplateUrlQuery{}
-}
-
-func IsBoardSelected(id string) bool {
-	return slices.Contains(tm.UrlQuery.Boards, id)
 }
 
 func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
@@ -133,17 +141,38 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
 		return tm.Boards[i].Name < tm.Boards[j].Name
 	})
 
-	// Images.
-	if queryMap["is"] != nil {
-		maxString := queryMap["is"][0]
-		imageSizeInt, err := strconv.Atoi(maxString)
+	// Image size.
+	tm.UrlQuery.ImageResolution = 2
+
+	if queryMap["res"] != nil {
+		maxString := queryMap["res"][0]
+		imgResInt, err := strconv.Atoi(maxString)
 
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			tm.UrlQuery.ImageSize = imageSizeInt
+			tm.UrlQuery.ImageResolution = imgResInt
 		}
 	}
 
 	return nil
+}
+
+func GetImageResolution(imgRes int, images Images) Image {
+	if imgRes == 0 {
+		return images.Small
+	}
+	if imgRes == 1 {
+		return images.Medium
+	}
+	if imgRes == 2 {
+		return images.Huge
+	}
+	if imgRes == 3 {
+		return images.Huge
+	}
+	if imgRes == 4 {
+		return images.Original
+	}
+	return images.Medium
 }
