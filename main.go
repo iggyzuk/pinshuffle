@@ -14,8 +14,15 @@ import (
 
 var client *PinterestClient
 var tm *TemplateModel
+var mock = false
 
 func main() {
+
+	if len(os.Args) > 1 {
+		if os.Args[1] == "-mock" {
+			mock = true
+		}
+	}
 
 	godotenv.Load(".env")
 

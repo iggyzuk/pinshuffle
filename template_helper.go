@@ -28,10 +28,11 @@ type TemplateBoard struct {
 }
 
 type TemplatePin struct {
+	Id       string
 	Name     string
 	Color    string
 	ImageURL string
-	Id       string
+	Board    *TemplateBoard
 }
 
 type TemplateUrlQuery struct {
@@ -57,42 +58,31 @@ func NewTemplateModel(authUrl string) *TemplateModel {
 	}
 }
 
-func (tm *TemplateModel) Mock() {
+func (tm *TemplateModel) Mock(uri *fasthttp.URI, clientBoards map[string]*Board) {
 	tm.OAuthURL = ""
 	tm.Authenticated = true
 
-	clientBoards["visual-style"] = &Board{Id: "visual-style", Name: "Visual Style"}
-	clientBoards["ideas"] = &Board{Id: "ideas", Name: "Ideas"}
-	clientBoards["concepts"] = &Board{Id: "concepts", Name: "Concepts"}
-
-	// ### You can override template board directly:
-
-	// tm.Boards = []TemplateBoard{
-	// 	{Name: "Visual Style", Id: "visual-style"},
-	// 	{Name: "Ideas", Id: "ideas"},
-	// 	{Name: "Concepts", Id: "concepts"},
-	// }
+	tm.ParseUrlQueries(uri, clientBoards)
 
 	tm.Pins = []TemplatePin{
-		{Id: "#1", Name: "Iggy", Color: "#000000", ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg"},
-		{Id: "#2", Name: "Deadly 30", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif"},
-		{Id: "#3", Name: "Kings", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/kings/img/kings.png"},
-		{Id: "#4", Name: "Ninja Rampage", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/ninja-rampage/img/ninja.gif"},
-		{Id: "#5", Name: "Red Baron", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/red-baron/img/red-baron.gif"},
-		{Id: "#6", Name: "Forks & Swords", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/swords-and-forks/img/swords-and-forks-animated.gif"},
-		{Id: "#7", Name: "Simple Outline", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/simple-outline/img/simple-outline.jpg"},
-		{Id: "#8", Name: "Greed Wars", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/greed-wars/img/greed-wars-animated.gif"},
-		{Id: "#9", Name: "Custom Engine (Mario)", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/cover.png"},
-		{Id: "#10", Name: "Game Coding Complete", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/books/game-coding.jpg"},
-		{Id: "#11", Name: "Code", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/code.png"},
-		{Id: "#12", Name: "Forest Monster", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/forest-monster/img/design/depth.jpg"},
+		{Id: "#1", Name: "Iggy", Color: "#000000", ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", Board: &tm.Boards[0]},
+		{Id: "#2", Name: "Deadly 30", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif", Board: &tm.Boards[0]},
+		{Id: "#3", Name: "Kings", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/kings/img/kings.png", Board: &tm.Boards[0]},
+		{Id: "#4", Name: "Ninja Rampage", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/ninja-rampage/img/ninja.gif", Board: &tm.Boards[0]},
+		{Id: "#5", Name: "Red Baron", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/red-baron/img/red-baron.gif", Board: &tm.Boards[1]},
+		{Id: "#6", Name: "Forks & Swords", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/swords-and-forks/img/swords-and-forks-animated.gif", Board: &tm.Boards[1]},
+		{Id: "#7", Name: "Simple Outline", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/simple-outline/img/simple-outline.jpg", Board: &tm.Boards[1]},
+		{Id: "#8", Name: "Greed Wars", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/greed-wars/img/greed-wars-animated.gif", Board: &tm.Boards[1]},
+		{Id: "#9", Name: "Custom Engine (Mario)", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/cover.png", Board: &tm.Boards[2]},
+		{Id: "#10", Name: "Game Coding Complete", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/books/game-coding.jpg", Board: &tm.Boards[2]},
+		{Id: "#11", Name: "Code", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/code.png", Board: &tm.Boards[2]},
+		{Id: "#12", Name: "Forest Monster", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/forest-monster/img/design/depth.jpg", Board: &tm.Boards[2]},
 	}
-	// tm.Error = "Mock Error!"
-	// tm.Message = "Mock Message..."
-	// tm.UrlQuery = &TemplateUrlQuery{}
+
+	tm.Message = "Mock"
 }
 
-func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
+func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[string]*Board) error {
 	queryString := string(uri.QueryString())
 	fmt.Println(queryString)
 

@@ -37,8 +37,11 @@
 
           <!-- Modal Header -->
           <div class="modal-header">
-              <a id="img-popup-url" href="#" target="_blank">
-                <h6 id="img-popup-title" class="modal-title">Title</h6>
+              <a id="img-popup-pin-url" href="#" target="_blank">
+                <h6 id="img-popup-pin-name" class="modal-title">Title</h6>
+              </a>
+              <a id="img-popup-board-url" href="#" target="_blank">
+                <h6 id="img-popup-board-name">Board</h6>
               </a>
           </div>
 
@@ -100,7 +103,7 @@
     <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
-        <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};" pin-title="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}"/>
+        <img class="grid-image" style="background-color:{{.Color}};" src="{{ .ImageURL }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}" board-name="{{ .Board.Name }}" pin-url="https://www.pinterest.co.uk/boards/{{ .Board.Id }}"/>
       </div>
       {{ end }}
     </div>

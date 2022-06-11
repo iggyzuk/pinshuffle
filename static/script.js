@@ -55,44 +55,30 @@ $(function () {
     pckry.packery('shuffle');
   };
 
-  // image popup.
+  // Show image popup.
   $(".grid-image").on('click', function(){
     $('#img-popup').modal('show');
 
+    // Set image.
     $src = $(this).attr('src');
-    $pinTitle = $(this).attr('pin-title');
-    $pinUrl = $(this).attr('pin-url');
-
     $('#img-popup-src').attr('src', $src);
-    document.getElementById("img-popup-title").innerText = $pinTitle;
-    $('#img-popup-url').attr('href', $pinUrl);
+
+    // Set pin info.
+    $pinName = $(this).attr('pin-name');
+    $pinUrl = $(this).attr('pin-url');
+    document.getElementById("img-popup-pin-name").innerText = $pinName;
+    $('#img-popup-pin-url').attr('href', $pinUrl);
+
+    // Set board info.
+    $boardName = $(this).attr('board-name');
+    $boardUrl = $(this).attr('board-url');
+    document.getElementById("img-popup-board-name").innerText = $boardName;
+    $('#img-popup-board-url').attr('href', $boardUrl);
+
   });
 
+  // Hide image popup.
   $("#img-popup").on('click', function(){
     $('#img-popup').modal('hide');
   });
-
-  // on click -> zoom element
-  // pckry.on( 'click', '.grid-image', function( event ) {
-  //   $(event.currentTarget.parentNode).toggleClass('grid-item--large');
-  //   pckry.packery('layout');
-  // });
-
-  // function close() {
-  //   $(".overlay-dark").css('display', 'none');
-  //   $('.img-overlay').css('opacity', 0);
-  //   $('.img-overlay').css('transform', 'translate(-50%, 0) scale(0, 0)');
-  //   $('.img-overlay').attr('src', null);
-  // }
-
-  // $(".grid-image").on('click', function() {
-  //   $src = $(this).attr('src');
-  //   $('.img-overlay').attr('src', $src);
-  //   $(".overlay-dark").css('display', 'block');
-  //   $('.img-overlay').css('opacity', 1);
-  //   $('.img-overlay').css('transform', 'translate(-50%, 0) scale(1, 1)');
-  // });
-
-  // $(".overlay-dark").on('click', close);
-  // $(".img-overlay").on('click', close);
 });

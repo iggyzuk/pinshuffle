@@ -8,13 +8,14 @@ import (
 )
 
 type Randomizer struct {
+	ClientBoards map[string]*Board
 	BoardIds     []string
 	Max          int
 	PinsPerBoard int
 }
 
-func NewRandomizer() *Randomizer {
-	return &Randomizer{}
+func NewRandomizer(clientBoards map[string]*Board) *Randomizer {
+	return &Randomizer{ClientBoards: clientBoards}
 }
 
 func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) []Pin {
@@ -43,7 +44,7 @@ func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 		id := boardId
 
 		go func() {
-			newPins := rnd.FetchPinsFromBoard(clientBoards[id])
+			newPins := rnd.FetchPinsFromBoard(rnd.ClientBoards[id])
 			pins = append(pins, newPins...)
 			wg.Done()
 		}()
