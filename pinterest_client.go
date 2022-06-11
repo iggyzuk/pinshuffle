@@ -182,11 +182,11 @@ func (client *PinterestClient) ExecuteRequest(endpoint string) []byte {
 	return bytes
 }
 
-func (client *PinterestClient) FetchBoards() Boards {
+func (client *PinterestClient) FetchBoards() *Boards {
 
 	bytes := client.ExecuteRequest("/boards?page_size=100")
 
-	var boards Boards
+	var boards = new(Boards)
 	unmarshalErr := json.Unmarshal(bytes, &boards)
 	if unmarshalErr != nil {
 		log.Fatal(unmarshalErr)
@@ -211,7 +211,7 @@ func (client *PinterestClient) FetchAllPins(board *Board) []Pin {
 	return resultingPins
 }
 
-func (client *PinterestClient) FetchPage(board *Board, bookmark string) Pins {
+func (client *PinterestClient) FetchPage(board *Board, bookmark string) *Pins {
 
 	url := "/boards/" + board.Id + "/pins?page_size=100"
 	if len(bookmark) > 0 {
@@ -220,7 +220,7 @@ func (client *PinterestClient) FetchPage(board *Board, bookmark string) Pins {
 
 	bytes := client.ExecuteRequest(url)
 
-	var pins Pins
+	var pins = new(Pins)
 	unmarshalErr := json.Unmarshal(bytes, &pins)
 	if unmarshalErr != nil {
 		log.Fatal(unmarshalErr)

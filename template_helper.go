@@ -22,9 +22,9 @@ type TemplateModel struct {
 }
 
 type TemplateBoard struct {
-	Name     string
-	Id       string
-	PinCount int
+	Board *Board
+	Name  string
+	Id    string
 }
 
 type TemplatePin struct {
@@ -54,9 +54,9 @@ func (tm *TemplateModel) Mock() {
 	tm.OAuthURL = ""
 	tm.Authenticated = true
 	tm.Boards = []TemplateBoard{
-		{Name: "Visual Style", Id: "visual-style", PinCount: 1275},
-		{Name: "Ideas", Id: "ideas", PinCount: 947},
-		{Name: "Concepts", Id: "concepts", PinCount: 802},
+		{Name: "Visual Style", Id: "visual-style"},
+		{Name: "Ideas", Id: "ideas"},
+		{Name: "Concepts", Id: "concepts"},
 	}
 	tm.Pins = []TemplatePin{
 		{ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", PinURL: "#", Color: "#000000"},
@@ -78,7 +78,7 @@ func (tm *TemplateModel) Mock() {
 }
 
 func IsBoardSelected(id string) bool {
-	return slices.Contains(randomizer.Boards, id)
+	return slices.Contains(tm.UrlQuery.Boards, id)
 }
 
 func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {

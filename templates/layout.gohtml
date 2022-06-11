@@ -132,7 +132,8 @@
 
               {{ range .Boards }}
               <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if isBoardSelected (.Id) }} checked {{ end }}/> 
-              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCount }}</span></label>
+              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} </label>
+              {{/* <span class="float-right badge badge-danger badge-pill">{{ .PinCount }}</span> */}}
               {{ end }}
 
               {{/* {{ if len ( .FollowedBoards ) }}

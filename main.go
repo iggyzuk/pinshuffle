@@ -14,7 +14,6 @@ import (
 
 var client *PinterestClient
 var tm *TemplateModel
-var randomizer *Randomizer
 
 func main() {
 

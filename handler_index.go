@@ -24,22 +24,30 @@ func indexHandler(c *fiber.Ctx) error {
 		var templateBoards []TemplateBoard
 		for _, board := range client.FetchBoards().Items {
 			templateBoards = append(templateBoards, TemplateBoard{
-				Name:     board.Name,
-				Id:       board.Id,
-				PinCount: 0, // TODO: is this still possible without counting here?
+				Board: &board,
+				Name:  board.Name,
+				Id:    board.Id,
 			})
 		}
 		tm.Boards = templateBoards
+
+		// tm.Mock()
+
+		err := tm.ParseUrlQueries(c.Context().URI())
+		if err != nil {
+			return err
+		}
+
+		randomizedPins := NewRandomizer().GetRandomizedPins(tm)
+
+		for _, rp := range randomizedPins {
+			tm.Pins = append(tm.Pins, TemplatePin{
+				ImageURL: rp.Media.Images.Medium.Url,
+				PinURL:   "#",
+				Color:    rp.Color,
+			})
+		}
 	}
-
-	err := tm.ParseUrlQueries(c.Context().URI())
-	if err != nil {
-		return err
-	}
-
-	// tm.Mock()
-
-	randomizer = NewRandomizer(tm.UrlQuery)
 
 	// Render the HTML page.
 	return c.Render("layout", tm)
