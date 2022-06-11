@@ -22,10 +22,11 @@ func indexHandler(c *fiber.Ctx) error {
 		tm.Authenticated = true
 
 		var templateBoards []TemplateBoard
-		for _, b := range client.FetchBoards().Items {
+		for _, board := range client.FetchBoards().Items {
 			templateBoards = append(templateBoards, TemplateBoard{
-				Name:     b.Name,
-				PinCount: 16, // TODO: is this still possible?
+				Name:     board.Name,
+				Id:       board.Id,
+				PinCount: 0, // TODO: is this still possible without counting here?
 			})
 		}
 		tm.Boards = templateBoards

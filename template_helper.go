@@ -1,11 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 
-	"github.com/ahmetb/go-linq/v3"
 	"github.com/valyala/fasthttp"
 	"golang.org/x/exp/slices"
 )
@@ -107,15 +107,14 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
 
 	// Boards.
 	if queryMap["b"] != nil {
-		for _, b := range queryMap["b"] {
+		for _, boardId := range queryMap["b"] {
 
-			valid := linq.From(tm.Boards).Where(func(board interface{}) bool {
-				return board.(TemplateBoard).Id == b
-			}).Any()
-
-			if valid {
-				tm.UrlQuery.Boards = append(tm.UrlQuery.Boards, b)
+			board, err := tm.FindBoardWithId(boardId)
+			if err != nil {
+				return err
 			}
+
+			tm.UrlQuery.Boards = append(tm.UrlQuery.Boards, board.Id)
 
 		}
 	}
@@ -123,4 +122,13 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
 	fmt.Printf("TemplateQuery: %+v", tm.UrlQuery)
 
 	return nil
+}
+
+func (tm *TemplateModel) FindBoardWithId(id string) (*TemplateBoard, error) {
+	for _, i := range tm.Boards {
+		if i.Id == id {
+			return &i, nil
+		}
+	}
+	return nil, errors.New("No board with id: " + id)
 }
