@@ -142,7 +142,7 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI) error {
 	})
 
 	// Image size.
-	tm.UrlQuery.ImageResolution = 2
+	tm.UrlQuery.ImageResolution = 1
 
 	if queryMap["res"] != nil {
 		maxString := queryMap["res"][0]
