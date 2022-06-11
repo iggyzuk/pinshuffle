@@ -36,7 +36,7 @@ func indexHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	tm.Mock()
+	// tm.Mock()
 
 	randomizer = NewRandomizer(tm.UrlQuery)
 
