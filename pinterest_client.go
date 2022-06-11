@@ -48,10 +48,10 @@ type Pins struct {
 }
 
 type Pin struct {
-	Id    string `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"dominant_color"`
-	Media Media  `json:"media"`
+	Id            string `json:"id"`
+	Title         string `json:"title"`
+	DominantColor string `json:"dominant_color"`
+	Media         Media  `json:"media"`
 }
 
 type Media struct {

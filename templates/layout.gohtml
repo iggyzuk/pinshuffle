@@ -30,9 +30,26 @@
 
 <body>
 
-  <!-- Image Popup -->
-  <div class="overlay-dark"></div>
-  <img class="img-overlay"/>
+   <!-- Image Popup Modal -->
+    <div class="modal fade" id="img-popup" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+              <a id="img-popup-url" href="#" target="_blank">
+                <h6 id="img-popup-title" class="modal-title">Title</h6>
+              </a>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <img id="img-popup-src" src="https://iggyzuk.com/projects/deadly-30/img/d30.gif"/>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
   <div class="container-fluid p-1">
 
@@ -83,8 +100,7 @@
     <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
-        <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
-        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="static/img/pin.png"/></a>
+        <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};" pin-title="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}"/>
       </div>
       {{ end }}
     </div>

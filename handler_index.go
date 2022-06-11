@@ -51,9 +51,10 @@ func indexHandler(c *fiber.Ctx) error {
 
 			for _, randomizedPin := range randomizedPins {
 				tm.Pins = append(tm.Pins, TemplatePin{
+					Id:       randomizedPin.Id,
+					Name:     randomizedPin.Title,
+					Color:    randomizedPin.DominantColor,
 					ImageURL: GetImageResolution(tm.UrlQuery.ImageResolution, randomizedPin.Media.Images).Url,
-					PinURL:   "#",
-					Color:    randomizedPin.Color,
 				})
 			}
 		}
