@@ -50,14 +50,32 @@ $(function () {
     itemSelector: '.grid-item',
   });
 
-  // on click -> zoom element
-  pckry.on( 'click', '.grid-image', function( event ) {
-    $(event.currentTarget.parentNode).toggleClass('grid-item--large');
-    pckry.packery('layout');
-  });
-
   // on click -> shuffle all elements
   document.querySelector('#shuffle-button').onclick = function() {
     pckry.packery('shuffle');
   };
+
+  // on click -> zoom element
+  // pckry.on( 'click', '.grid-image', function( event ) {
+  //   $(event.currentTarget.parentNode).toggleClass('grid-item--large');
+  //   pckry.packery('layout');
+  // });
+
+  function close() {
+    $(".overlay-dark").css('display', 'none');
+    $('.img-overlay').css('opacity', 0);
+    $('.img-overlay').css('transform', 'translate(-50%, 0) scale(0, 0)');
+    $('.img-overlay').attr('src', null);
+  }
+
+  $(".grid-image").on('click', function() {
+    $src = $(this).attr('src');
+    $('.img-overlay').attr('src', $src);
+    $(".overlay-dark").css('display', 'block');
+    $('.img-overlay').css('opacity', 1);
+    $('.img-overlay').css('transform', 'translate(-50%, 0) scale(1, 1)');
+  });
+
+  $(".overlay-dark").on('click', close);
+  $(".img-overlay").on('click', close);
 });

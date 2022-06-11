@@ -6,8 +6,9 @@ import (
 )
 
 type Randomizer struct {
-	Boards []string
-	Max    int
+	Boards       []string
+	Max          int
+	PinsPerBoard int
 }
 
 func NewRandomizer(urlQueryModel *TemplateUrlQuery) *Randomizer {
@@ -19,6 +20,10 @@ func NewRandomizer(urlQueryModel *TemplateUrlQuery) *Randomizer {
 func (r *Randomizer) ProccessBoards(urlQueryModel *TemplateUrlQuery) {
 	for _, queryBoard := range urlQueryModel.Boards {
 		r.Boards = append(r.Boards, queryBoard)
+	}
+	boardCount := len(r.Boards)
+	if boardCount > 0 {
+		r.PinsPerBoard = r.Max / boardCount
 	}
 }
 

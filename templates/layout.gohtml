@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-  <title>Shuffle – Pinterest Board Randomizer</title>
+  <title>Pinshuffle – Pinterest Board Randomizer</title>
   <meta charset="utf-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
   <meta name="theme-color" content="#111111" />
   <meta name="description" content="Pinterest Board Randomizer">
-  <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity">
+  <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity, Pinshuffle">
   <meta name="author" content="Iggy Zuk">
 
   <link rel="apple-touch-icon" sizes="180x180" href="static/img/favicon/apple-touch-icon.png">
@@ -16,9 +16,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon/favicon-16x16.png">
   <link rel="manifest" href="static/img/favicon/site.webmanifest">
 
+
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
   <link rel="stylesheet" href="static/style/main.css">
   <link rel="stylesheet" href="static/style/checkbox.css">
-  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -28,6 +29,10 @@
 </head>
 
 <body>
+
+  <!-- Image Popup -->
+  <div class="overlay-dark"></div>
+  <img class="img-overlay"/>
 
   <div class="container-fluid p-1">
 
@@ -45,10 +50,7 @@
 
           <!-- Modal body -->
           <div class="modal-body">
-            <div class="alert alert-warning" role="alert">
-              Shuffle is currently broken due Pinterest API getting deprecated. It will get fixed when the new version becomes available.
-            </div>
-            <p class="lead"><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
+            <p class="lead"><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> boards and shuffles them around. It does <b>not</b> modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
             <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/">Pinterest</a>.</p>
             <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p>
           </div>
@@ -68,24 +70,24 @@
     {{ if .Error }}
     <div class="alert alert-danger alert-dismissible fade show">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      {{ upper .Error }}
+      {{ .Error }}
     </div>
     {{ end }}
     {{ if .Message }}
     <div class="alert alert-primary alert-dismissible fade show">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      {{ upper .Message }}
+      {{ .Message }}
     </div>
     {{ end }}
 
-    {{/* <div class="grid">
+    <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
         <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
-        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/img/pin.png"/></a>
+        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="static/img/pin.png"/></a>
       </div>
       {{ end }}
-    </div> */}}
+    </div>
 
     <!-- Bottom buttons -->
     <div class="fixed-bottom content p-1">
@@ -100,6 +102,8 @@
 
   </div>
 
+  {{/* <p>The Name of the Pin!</p> */}}
+
   <form action="/" method="get">
 
   <!-- Boards Modal -->
@@ -109,7 +113,7 @@
 
         <!-- Board Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">⌗ Boards</h4>
+          <h4 class="modal-title">⌗ Boards <span class="badge badge-secondary badge-pill">{{ len .Boards }}</span></h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
@@ -122,9 +126,9 @@
             <!-- List Group -->
             <div class="list-group">
 
-              {{ if len ( .Boards ) }}
+              {{/* {{ if len ( .Boards ) }}
               <div class="list-group-item bg-success">Your Boards:</div>
-              {{ end }}
+              {{ end }} */}}
 
               {{ range .Boards }}
               <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if isBoardSelected (.Id) }} checked {{ end }}/> 

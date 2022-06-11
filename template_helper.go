@@ -28,9 +28,9 @@ type TemplateBoard struct {
 }
 
 type TemplatePin struct {
-	// Name     string
-	// URL      string
-	// PinCount int
+	ImageURL string
+	PinURL   string
+	Color    string
 }
 
 type TemplateUrlQuery struct {
@@ -58,10 +58,23 @@ func (tm *TemplateModel) Mock() {
 		{Name: "Ideas", Id: "ideas", PinCount: 947},
 		{Name: "Concepts", Id: "concepts", PinCount: 802},
 	}
-	tm.Pins = []TemplatePin{}
-	tm.Error = "Manual Error"
-	tm.Message = "Manual Message"
-	tm.UrlQuery = &TemplateUrlQuery{}
+	tm.Pins = []TemplatePin{
+		{ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/kings/img/kings.png", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/ninja-rampage/img/ninja.gif", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/red-baron/img/red-baron.gif", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/swords-and-forks/img/swords-and-forks-animated.gif", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/simple-outline/img/simple-outline.jpg", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/greed-wars/img/greed-wars-animated.gif", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/game-engine/img/cover.png", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/game-engine/img/books/game-coding.jpg", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/game-engine/img/code.png", PinURL: "#", Color: "#000000"},
+		{ImageURL: "https://iggyzuk.com/projects/forest-monster/img/design/depth.jpg", PinURL: "#", Color: "#000000"},
+	}
+	tm.Error = "Mock Error!"
+	tm.Message = "Mock Message..."
+	// tm.UrlQuery = &TemplateUrlQuery{}
 }
 
 func IsBoardSelected(id string) bool {
