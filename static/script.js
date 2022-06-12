@@ -67,15 +67,15 @@ $(function () {
     $pinName = $(this).attr('pin-name');
     $pinUrl = $(this).attr('pin-url');
     $pinElement = document.getElementById("img-popup-pin-name");
-    pinElement.innerText = $pinName;
-    pinElement.attr('href', $pinUrl);
+    $pinElement.innerText = $pinName;
+    $pinElement.attr('href', $pinUrl);
 
     // Set board info.
     $boardName = $(this).attr('board-name');
     $boardUrl = $(this).attr('board-url');
     $boardElement = document.getElementById("img-popup-board-name");
-    boardElement.innerText = $boardName;
-    boardElement.attr('href', $boardUrl);
+    $boardElement.innerText = $boardName;
+    $boardElement.attr('href', $boardUrl);
 
   });
 
