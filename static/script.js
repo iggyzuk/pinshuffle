@@ -21,6 +21,10 @@ function setCookie(cname, cvalue, exdays) {
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
+function eraseCookie(cname) {   
+  document.cookie = cname + '=; Max-Age=-99999999;';  
+}
+
 function applyThemeFromCookie() {
   var theme = getCookie("selected_theme");
   if (theme != "") {

@@ -36,7 +36,7 @@
         <div class="modal-content">
 
           <!-- Modal Header -->
-          {{/* <div class="modal-header"> */}}
+          <div class="modal-content">
 
             <div class="d-flex justify-content-center">
 
@@ -51,7 +51,7 @@
               </div>
 
             </div>
-          {{/* </div> */}}
+          </div>
 
           <!-- Modal body -->
           <div class="modal-body">
@@ -232,16 +232,29 @@
         <div class="modal-body">
 
           <!-- User profile -->
-          <img src="{{ .User.IconURL }}" style="border-radius: 50%; width: 32px; height:32px; margin:0 8px 0 8px;"/><a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a></p>
+          <div class="d-flex justify-content-center">
+            <span class="p-2"><img src="{{ .User.IconURL }}" style="border-radius: 50%; width: 32px; height:32px; margin:0 8px 0 8px;"/><a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a></span>
+            <button log-out-button class="p-2 btn btn-danger m-1" type="button" > 👞 Logout</button>
+          </div>
+
+          <!-- Logout -->
+          <script>
+          $("button[log-out-button]").click(function() {
+            eraseCookie("access_token");
+            location.reload();
+          });
+          </script>
+
+          <hr/>
         
           <div class="d-flex justify-content-center">
               {{/* <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">🌝 Light</button> */}}
               <button data-theme="static/style/bootstrap4-charming.min.css" type="button" class="btn btn-light m-1"> ✨ Charming</button>
               <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">🌚 Darkly</button>
-              <button data-theme="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/sketchy/bootstrap.min.css" type="button" class="btn btn-info m-1"> ✏️ Sketchy</button>
+              <button data-theme="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/sketchy/bootstrap.min.css" type="button" class="btn btn-warning m-1"> ✏️ Sketchy</button>
               {{/* <button data-theme="static/style/bootstrap-sketchy.min.css" type="button" class="btn btn-info m-1"> ✏️ Sketchy</button> */}}
               {{/* <button data-theme="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/slate/bootstrap.min.css" type="button" class="btn btn-secondary m-1"> 🎬 Slate</button> */}}
-              <button data-theme="static/style/bootstrap4-neon-glow.min.css" type="button" class="btn btn-danger m-1"> ◈ Neon</button>
+              <button data-theme="static/style/bootstrap4-neon-glow.min.css" type="button" class="btn btn-info m-1"> ◈ Neon</button>
           </div>
 
           <!-- Switch themes -->
