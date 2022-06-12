@@ -58,7 +58,9 @@ func NewTemplateModel(authUrl string) *TemplateModel {
 	return &TemplateModel{
 		OAuthURL:      authUrl,
 		Authenticated: false,
+		User:          &TemplateUser{Name: "unknown", IconURL: "#", URL: "#"},
 		Boards:        nil,
+		BoardMap:      make(map[string]*TemplateBoard),
 		Pins:          nil,
 		Error:         "",
 		Message:       "",
@@ -129,8 +131,6 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[str
 	}
 
 	fmt.Printf("Query: %+v \n", tm.UrlQuery)
-
-	tm.BoardMap = make(map[string]*TemplateBoard)
 
 	for _, val := range clientBoards {
 

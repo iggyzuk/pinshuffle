@@ -40,9 +40,9 @@ func indexHandler(c *fiber.Ctx) error {
 			user, userErr := client.FetchUserAccount()
 			if userErr != nil {
 				tm.Error = userErr.Error()
+			} else {
+				tm.User = &TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
 			}
-
-			tm.User = &TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
 
 			// Real: fetch boards, process url, randomize.
 
