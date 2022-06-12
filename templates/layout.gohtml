@@ -115,12 +115,24 @@
     </div>
 
     <!-- Bottom buttons -->
-    <div class="fixed-bottom d-flex flex-row justify-content-end">
-      <button id="shuffle-button" type="button" class="btn btn-danger btn m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
-      <button type="button" class="btn btn-secondary btn m-1" data-toggle="modal" data-target="#boards-modal">📒 Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
-      <button type="button" class="btn btn-outline-primary btn m-1" data-toggle="modal" data-target="#settings-modal">⚙️</button>
-    </div> 
+    <div class="fixed-bottom">
+      <div class="float-right">
+        <div class="container p-0">
 
+          <!-- THE SHUFFLE BUTTON -->
+          <div class="row m-1">
+              <button id="shuffle-button" type="button" class="btn btn-danger col-sm">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
+          </div>
+
+          <!-- Boards & Settings -->
+          <div class="row m-1">
+            <button type="button" class="btn btn-secondary btn col-sm" data-toggle="modal" data-target="#boards-modal">📒 Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
+            <button type="button" class="btn btn-outline-primary ml-1" data-toggle="modal" data-target="#settings-modal">⚙️</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   {{/* <p>The Name of the Pin!</p> */}}
