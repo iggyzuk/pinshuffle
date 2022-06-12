@@ -66,7 +66,8 @@ $(function () {
     // Set pin info.
     $pinName = $(this).attr('pin-name');      // pin-name attribute from .grid-image
     $pinUrl = $(this).attr('pin-url');        // pin-url attribute from .grid-image
-    document.getElementById("img-popup-pin-name").innerText = $pinName; // <a id="img-popup-pin-name" href="#">Title</a>
+    // TODO: uncomment this when the pin.title starts working again.
+    // document.getElementById("img-popup-pin-name").innerText = $pinName; // <a id="img-popup-pin-name" href="#">Title</a>
     $('#img-popup-pin-name').attr('href', $pinUrl);
 
     // Set board info.

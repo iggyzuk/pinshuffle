@@ -42,7 +42,7 @@
 
               <!-- Title -->
               <div class="p-2">
-                <a id="img-popup-pin-name" href="#" target="_blank">Title</a>
+                <a id="img-popup-pin-name" href="#" target="_blank">Open Pin</a>
               </div>
 
               <!-- Board -->
@@ -109,9 +109,10 @@
     {{ end }}
 
     <div class="grid">
+      {{ $user := .User }}
       {{ range .Pins }}
       <div class="grid-item">
-        <img class="grid-image" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}" board-name="{{ .Board.Name }}" pin-url="https://www.pinterest.co.uk/boards/{{ .Board.Id }}"/>
+        <img class="grid-image" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}" board-name="{{ .Board.Name }}" board-url="https://www.pinterest.co.uk/boards/{{ $user.Name }}/{{ .Board.Id }}"/>
       </div>
       {{ end }}
     </div>
