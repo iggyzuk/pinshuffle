@@ -37,6 +37,13 @@ func indexHandler(c *fiber.Ctx) error {
 			client.AccessToken = cookie
 			tm.Authenticated = true
 
+			user, userErr := client.FetchUserAccount()
+			if userErr != nil {
+				tm.Error = userErr.Error()
+			}
+
+			tm.User = &TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
+
 			// Real: fetch boards, process url, randomize.
 
 			var clientBoards = make(map[string]*Board)

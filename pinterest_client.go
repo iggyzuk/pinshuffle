@@ -34,6 +34,12 @@ type AccessTokenResponse struct {
 	Scope                 string `json:"scope"`
 }
 
+type UserAccount struct {
+	ProfileImage string `json:"profile_image"`
+	WebsiteURL   string `json:"website_url"`
+	Username     string `json:"username"`
+}
+
 type Boards struct {
 	Items []Board `json:"items"`
 }
@@ -194,6 +200,23 @@ func (client *PinterestClient) ExecuteRequest(endpoint string) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func (client *PinterestClient) FetchUserAccount() (*UserAccount, error) {
+
+	bytes, err := client.ExecuteRequest("/user_account")
+
+	if err != nil {
+		return nil, err
+	}
+
+	var userAccount = new(UserAccount)
+	unmarshalErr := json.Unmarshal(bytes, &userAccount)
+	if unmarshalErr != nil {
+		return nil, unmarshalErr
+	}
+
+	return userAccount, nil
 }
 
 func (client *PinterestClient) FetchBoards() (*Boards, error) {
