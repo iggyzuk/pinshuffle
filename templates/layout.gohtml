@@ -34,27 +34,26 @@
       <div class="modal-dialog">
         <div class="modal-content">
 
-          <!-- Modal Header -->
-          <div class="modal-content">
+          <!-- Image Popup Header -->
+          <div class="row justify-content-end">
 
-            <div class="d-flex justify-content-center">
-
-              <!-- Title -->
-              <div class="p-2">
-                <a id="img-popup-pin-name" href="#" target="_blank">Open Pin</a>
-              </div>
-
-              <!-- Board -->
-              <div class="p-2">
-                <span class="badge badge-info"><span id="img-popup-board-name" href="#" target="_blank">Board</span></span>
-              </div>
-
+            <!-- Open Pin -->
+            <div class="col-4 d-flex justify-content-center">
+              <a href="#open-pin-link" id="img-popup-pin-name" class="btn btn-xs btn-outline-primary m-1 w-100 font-weight-bold" role="button">Open Pin</a>
             </div>
+
+            <!-- Board Badge -->
+            <div class="col-4 d-flex justify-content-end">
+              <div class="badge badge-secondary m-2 align-self-center">
+                <span id="img-popup-board-name" href="#" target="_blank">Board</span>
+              </div>
+            </div>
+
           </div>
 
-          <!-- Modal body -->
-          <div class="modal-body">
-            <img id="img-popup-src" src="#"/>
+          <!-- Zoomed in Image -->
+          <div class="px-1 pb-1">
+            <img id="img-popup-src" class="rounded" src="#"/>
           </div>
 
         </div>
@@ -116,14 +115,10 @@
     </div>
 
     <!-- Bottom buttons -->
-    <div class="fixed-bottom content p-1">
-      <div>
-        <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#settings-modal">⚙️</button>
-
-        <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
-
-        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">📒 Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
-      </div>
+    <div class="fixed-bottom d-flex flex-row justify-content-end">
+      <button id="shuffle-button" type="button" class="btn btn-danger btn m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
+      <button type="button" class="btn btn-secondary btn m-1" data-toggle="modal" data-target="#boards-modal">📒 Boards <span class="badge badge-light badge-pill">{{ len .Boards }}</span></button>
+      <button type="button" class="btn btn-outline-primary btn m-1" data-toggle="modal" data-target="#settings-modal">⚙️</button>
     </div> 
 
   </div>
@@ -184,8 +179,8 @@
           <div class="d-flex justify-content-between">          
 
               <!-- Max Input -->
-              <div class="d-flex justify-content-between">
-                <label class="align-self-center px-2" for="max">Max</label>
+              <div class="d-flex justify-content-between pr-2">
+                <label class="align-self-center pr-2" for="max">Max</label>
                 <input
                   id="max"
                   class="form-control align-self-center"
@@ -198,8 +193,8 @@
                   value={{.UrlQuery.Max}} />
               </div>
 
-              <div class="d-flex justify-content-between">
-                <label class="align-self-center px-2" for="resolution">Resolution </label>
+              <div class="d-flex justify-content-between pr-2">
+                <label class="align-self-center pr-2" for="resolution">Resolution </label>
 
                 <!-- Resolution Input -->
                 <select class="form-control align-self-center" id="res" name="res">
@@ -242,7 +237,7 @@
 
           <!-- User profile -->
           <div class="d-flex justify-content-center">
-            <span class="p-2"><img src="{{ .User.IconURL }}" style="border-radius: 50%; width: 32px; height:32px; margin:0 8px 0 8px;"/><a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a></span>
+            <span class="p-2"><img src="{{ .User.IconURL }}" class="rounded-circle mx-2" style="width: 32px; height:32px;"/><a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a></span>
             <button log-out-button class="p-2 btn btn-danger m-1" type="button" > 👞 Logout</button>
           </div>
 
