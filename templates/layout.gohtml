@@ -16,8 +16,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon/favicon-16x16.png">
   <link rel="manifest" href="static/img/favicon/site.webmanifest">
 
-
-  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
+  <link id="theme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/sketchy/bootstrap.min.css">
   <link rel="stylesheet" href="static/style/main.css">
   <link rel="stylesheet" href="static/style/checkbox.css">
 
@@ -80,7 +79,7 @@
           <div class="modal-body">
             <p class="lead"><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/" target="_blank">Pinterest</a> boards and shuffles them around. It does not modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
             <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/" target="_blank">Pinterest</a>.</p>
-            <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p>
+            <p class="small">By continuing you agree for Pinshuffle to store cookies for access token and the selected theme.</p>
           </div>
 
         </div>
@@ -180,34 +179,44 @@
         </div>
 
         <!-- Board Modal Footer -->
-        <div class="modal-footer float-none">
+        <div class="p-3">
 
-            <!-- Max Input -->
-            <label for="max">Max</label>
-            <input
-              id="max"
-              class="form-control"
-              type="number"
-              name="max"
-              min="0"
-              max="10000"
-              type="text"
-              placeholder="Total Pins"
-              value={{.UrlQuery.Max}} />
+          <div class="d-flex justify-content-between">          
 
-            <label for="resolution">Resolution </label>
+              <!-- Max Input -->
+              <div class="d-flex justify-content-between">
+                <label class="align-self-center pr-2" for="max">Max</label>
+                <input
+                  id="max"
+                  class="form-control align-self-center"
+                  type="number"
+                  name="max"
+                  min="0"
+                  max="10000"
+                  type="text"
+                  placeholder="Total Pins"
+                  value={{.UrlQuery.Max}} />
+              </div>
 
-            <!-- Resolution Input -->
-            <select class="form-control" id="res" name="res">
-              <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
-              <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
-              <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
-              <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
-              <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
-            </select>
+              <div class="d-flex justify-content-between">
+                <label class="align-self-center pr-2" for="resolution">Resolution </label>
 
-          <!-- Submit the form -->
-          <button type="submit" class="btn btn-success">Go!</button>
+                <!-- Resolution Input -->
+                <select class="form-control align-self-center" id="res" name="res">
+                  <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
+                  <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
+                  <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
+                  <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
+                  <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
+                </select>
+              </div>
+
+            <!-- Submit the form -->
+            <div class="w-25">
+              <button type="submit" class="btn btn-success align-self-center w-100">Go!</button>
+            </div>
+
+          </div>
 
         </div>
 
@@ -247,7 +256,7 @@
 
           <hr/>
         
-          <div class="d-flex justify-content-center">
+          <div class="d-flex justify-content-between">
               {{/* <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">🌝 Light</button> */}}
               <button data-theme="static/style/bootstrap4-charming.min.css" type="button" class="btn btn-light m-1"> ✨ Charming</button>
               <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">🌚 Darkly</button>
