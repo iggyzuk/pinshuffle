@@ -66,14 +66,16 @@ $(function () {
     // Set pin info.
     $pinName = $(this).attr('pin-name');
     $pinUrl = $(this).attr('pin-url');
-    document.getElementById("img-popup-pin-name").innerText = $pinName;
-    $('#img-popup-pin-url').attr('href', $pinUrl);
+    $pinElement = document.getElementById("img-popup-pin-name");
+    pinElement.innerText = $pinName;
+    pinElement.attr('href', $pinUrl);
 
     // Set board info.
     $boardName = $(this).attr('board-name');
     $boardUrl = $(this).attr('board-url');
-    document.getElementById("img-popup-board-name").innerText = $boardName;
-    $('#img-popup-board-url').attr('href', $boardUrl);
+    $boardElement = document.getElementById("img-popup-board-name");
+    boardElement.innerText = $boardName;
+    boardElement.attr('href', $boardUrl);
 
   });
 

@@ -36,14 +36,22 @@
         <div class="modal-content">
 
           <!-- Modal Header -->
-          <div class="modal-header">
-              <a id="img-popup-pin-url" href="#" target="_blank">
-                <h6 id="img-popup-pin-name" class="modal-title">Title</h6>
-              </a>
-              <a id="img-popup-board-url" href="#" target="_blank">
-                <h6 id="img-popup-board-name">Board</h6>
-              </a>
-          </div>
+          {{/* <div class="modal-header"> */}}
+
+            <div class="d-flex justify-content-center">
+
+              <!-- Title -->
+              <div class="p-2">
+                <a id="img-popup-pin-name" href="#" target="_blank">Title</a>
+              </div>
+
+              <!-- Board -->
+              <div class="p-2">
+                <a id="img-popup-board-name" href="#" target="_blank">Board</a>
+              </div>
+
+            </div>
+          {{/* </div> */}}
 
           <!-- Modal body -->
           <div class="modal-body">
@@ -222,17 +230,17 @@
         <!-- Modal body -->
         <div class="modal-body">
 
-          <div class="content">
-            <p><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> boards and shuffles them around. It does <b>not</b> modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
-          </div>
-
-          <hr class="my-4">
-
-          {{/* <dl><h5>👁 Theme:</h5></dl> */}}
-          
+          <!-- User profile -->
+          <img src="{{ .User.IconURL }}" style="border-radius: 50%; width: 32px; height:32px; margin:0 8px 0 8px;"/><a href="{{ .User.URL }}"><b>{{ .User.Name }}</b></a></p>
+        
           <div class="d-flex justify-content-center">
-              <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">🌝 Light</button>
-              <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">🌚 Dark</button>
+              {{/* <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">🌝 Light</button> */}}
+              <button data-theme="static/style/bootstrap4-charming.min.css" type="button" class="btn btn-light m-1"> ✨ Charming</button>
+              <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">🌚 Darkly</button>
+              <button data-theme="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/sketchy/bootstrap.min.css" type="button" class="btn btn-info m-1"> ✏️ Sketchy</button>
+              {{/* <button data-theme="static/style/bootstrap-sketchy.min.css" type="button" class="btn btn-info m-1"> ✏️ Sketchy</button> */}}
+              {{/* <button data-theme="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/slate/bootstrap.min.css" type="button" class="btn btn-secondary m-1"> 🎬 Slate</button> */}}
+              <button data-theme="static/style/bootstrap4-neon-glow.min.css" type="button" class="btn btn-danger m-1"> ◈ Neon</button>
           </div>
 
           <!-- Switch themes -->
@@ -241,10 +249,13 @@
             setCookie("selected_theme", $(this).data("theme"), 365);
             $("head link#theme").attr("href", $(this).data("theme"));
           });
-
           </script>
 
           <hr class="my-4">
+
+          <div class="content">
+            <p><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> boards and shuffles them around. It does <b>not</b> modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
+          </div>
 
           <div class="content">
             {{/* <dl><h5>🔒 Privacy:</h5></dl> */}}

@@ -14,12 +14,19 @@ import (
 type TemplateModel struct {
 	OAuthURL      string
 	Authenticated bool
+	User          *TemplateUser
 	Boards        []TemplateBoard
 	Pins          []TemplatePin
 	Error         string
 	Message       string
 	UrlQuery      *TemplateUrlQuery
 	ImageSize     int
+}
+
+type TemplateUser struct {
+	Name    string
+	IconURL string
+	URL     string
 }
 
 type TemplateBoard struct {
@@ -61,6 +68,8 @@ func NewTemplateModel(authUrl string) *TemplateModel {
 func (tm *TemplateModel) Mock(uri *fasthttp.URI, clientBoards map[string]*Board) {
 	tm.OAuthURL = ""
 	tm.Authenticated = true
+
+	tm.User = &TemplateUser{Name: "Iggy Zuk", IconURL: "https://iggyzuk.com/img/profile/iggy.jpg", URL: "#"}
 
 	tm.ParseUrlQueries(uri, clientBoards)
 
