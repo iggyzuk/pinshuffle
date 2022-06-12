@@ -61,21 +61,19 @@ $(function () {
 
     // Set image.
     $src = $(this).attr('src');
-    $('#img-popup-src').attr('src', $src);
+    $('#img-popup-src').attr('src', $src); // <img id="img-popup-src" src="#"/>
 
     // Set pin info.
-    $pinName = $(this).attr('pin-name');
-    $pinUrl = $(this).attr('pin-url');
-    $pinElement = document.getElementById("img-popup-pin-name");
-    $pinElement.innerText = $pinName;
-    $pinElement.attr('href', $pinUrl);
+    $pinName = $(this).attr('pin-name');      // pin-name attribute from .grid-image
+    $pinUrl = $(this).attr('pin-url');        // pin-url attribute from .grid-image
+    document.getElementById("img-popup-pin-name").innerText = $pinName; // <a id="img-popup-pin-name" href="#">Title</a>
+    $('#img-popup-pin-name').attr('href', $pinUrl);
 
     // Set board info.
-    $boardName = $(this).attr('board-name');
-    $boardUrl = $(this).attr('board-url');
-    $boardElement = document.getElementById("img-popup-board-name");
-    $boardElement.innerText = $boardName;
-    $boardElement.attr('href', $boardUrl);
+    $boardName = $(this).attr('board-name');  // board-name attribute from .grid-image
+    $boardUrl = $(this).attr('board-url');    // board-name attribute from .grid-image
+    document.getElementById("img-popup-board-name").innerText = $boardName; // <a id="img-popup-board-name" href="#">Board</a>
+    $('#img-popup-board-name').attr('href', $boardUrl);
 
   });
 
