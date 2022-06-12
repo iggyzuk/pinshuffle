@@ -78,6 +78,8 @@ func indexHandler(c *fiber.Ctx) error {
 						Name:     randomizedPin.Title,
 						Color:    randomizedPin.DominantColor,
 						ImageURL: GetImageResolution(tm.UrlQuery.ImageResolution, randomizedPin.Media.Images).Url,
+						AltText:  randomizedPin.AltText,
+						Board:    tm.BoardMap[randomizedPin.BoardId],
 					})
 				}
 			}

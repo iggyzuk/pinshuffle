@@ -59,6 +59,8 @@ type Pin struct {
 	Title         string `json:"title"`
 	DominantColor string `json:"dominant_color"`
 	Media         Media  `json:"media"`
+	BoardId       string `json:"board_id"`
+	AltText       string `json:"alt_text"`
 }
 
 type Media struct {

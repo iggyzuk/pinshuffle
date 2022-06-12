@@ -16,6 +16,7 @@ type TemplateModel struct {
 	Authenticated bool
 	User          *TemplateUser
 	Boards        []TemplateBoard
+	BoardMap      map[string]*TemplateBoard // for convinience.
 	Pins          []TemplatePin
 	Error         string
 	Message       string
@@ -39,6 +40,7 @@ type TemplatePin struct {
 	Name     string
 	Color    string
 	ImageURL string
+	AltText  string
 	Board    *TemplateBoard
 }
 
@@ -74,7 +76,7 @@ func (tm *TemplateModel) Mock(uri *fasthttp.URI, clientBoards map[string]*Board)
 	tm.ParseUrlQueries(uri, clientBoards)
 
 	tm.Pins = []TemplatePin{
-		{Id: "#1", Name: "Iggy", Color: "#000000", ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", Board: &tm.Boards[0]},
+		{Id: "#1", Name: "Iggy", Color: "#000000", ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", Board: &tm.Boards[0], AltText: "Iggy Zuky"},
 		{Id: "#2", Name: "Deadly 30", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif", Board: &tm.Boards[0]},
 		{Id: "#3", Name: "Kings", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/kings/img/kings.png", Board: &tm.Boards[0]},
 		{Id: "#4", Name: "Ninja Rampage", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/ninja-rampage/img/ninja.gif", Board: &tm.Boards[0]},
@@ -128,11 +130,18 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[str
 
 	fmt.Printf("Query: %+v \n", tm.UrlQuery)
 
+	tm.BoardMap = make(map[string]*TemplateBoard)
+
 	for _, val := range clientBoards {
-		tm.Boards = append(tm.Boards, TemplateBoard{
+
+		newTemplateBoard := TemplateBoard{
 			Id:   val.Id,
 			Name: val.Name,
-		})
+		}
+
+		tm.Boards = append(tm.Boards, newTemplateBoard)
+
+		tm.BoardMap[newTemplateBoard.Id] = &newTemplateBoard
 
 		fmt.Printf("Board: %+v \n", val)
 	}
