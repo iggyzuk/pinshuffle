@@ -8,7 +8,8 @@ import (
 
 func indexHandler(c *fiber.Ctx) error {
 
-	tm := NewTemplateModel(client.GetAuthUri())
+	var client = NewClient()
+	var tm = NewTemplateModel(client.GetAuthUri())
 
 	if mock {
 
@@ -70,7 +71,7 @@ func indexHandler(c *fiber.Ctx) error {
 			// Randomize – if there are any url-specified boards.
 			if len(tm.UrlQuery.Boards) > 0 {
 
-				randomizedPins := NewRandomizer(clientBoards).GetRandomizedPins(tm.UrlQuery.Max, tm.UrlQuery.Boards)
+				randomizedPins := NewRandomizer(client, clientBoards).GetRandomizedPins(tm.UrlQuery.Max, tm.UrlQuery.Boards)
 
 				for _, randomizedPin := range randomizedPins {
 					tm.Pins = append(tm.Pins, TemplatePin{

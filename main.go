@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -11,8 +10,6 @@ import (
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
 )
-
-var client *PinterestClient
 
 var mock = false
 
@@ -25,10 +22,6 @@ func main() {
 	}
 
 	godotenv.Load(".env")
-
-	client = NewClient(os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"))
-
-	fmt.Printf("Pinterest Client: %+v", client)
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -21,7 +22,7 @@ type PinterestClient struct {
 	Scopes             string
 	HttpClient         *http.Client
 	DefaultContentType string
-	AccessToken        string // TODO: isn't this gonna get overriden?
+	AccessToken        string
 }
 
 type AccessTokenResponse struct {
@@ -79,11 +80,11 @@ type Image struct {
 	Url string `json:"url"`
 }
 
-func NewClient(id string, secret string) *PinterestClient {
+func NewClient() *PinterestClient {
 
 	return &PinterestClient{
-		AppID:       id,
-		Secret:      secret,
+		AppID:       os.Getenv("CLIENT_ID"),
+		Secret:      os.Getenv("CLIENT_SECRET"),
 		MainURL:     "https://pinshuffle.herokuapp.com/",
 		BaseURL:     "https://api.pinterest.com/v5",
 		RedirectUri: "https://pinshuffle.herokuapp.com/redirect/",

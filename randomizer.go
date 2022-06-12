@@ -8,14 +8,15 @@ import (
 )
 
 type Randomizer struct {
+	Client       *PinterestClient
 	ClientBoards map[string]*Board
 	BoardIds     []string
 	Max          int
 	PinsPerBoard int
 }
 
-func NewRandomizer(clientBoards map[string]*Board) *Randomizer {
-	return &Randomizer{ClientBoards: clientBoards}
+func NewRandomizer(client *PinterestClient, clientBoards map[string]*Board) *Randomizer {
+	return &Randomizer{Client: client, ClientBoards: clientBoards}
 }
 
 func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) []Pin {
@@ -59,7 +60,7 @@ func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 
 func (rnd *Randomizer) FetchPinsFromBoard(board *Board) []Pin {
 	fmt.Println("Fetching all pins from Board: " + board.Name)
-	allPins, err := client.FetchAllPins(board)
+	allPins, err := rnd.Client.FetchAllPins(board)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

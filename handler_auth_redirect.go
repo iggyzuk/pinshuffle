@@ -9,6 +9,8 @@ import (
 
 func authRedirectHandler(c *fiber.Ctx) error {
 
+	var client = NewClient()
+
 	// Once the user approves authorization for your app, they will be sent to your redirect URI as indicated in the request.
 	// 		We will add the following parameters as we make the call to your redirect URI:
 	//			code: This is the code you will use in the next step to exchange for an access token.
