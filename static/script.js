@@ -72,9 +72,9 @@ $(function () {
 
     // Set board info.
     $boardName = $(this).attr('board-name');  // board-name attribute from .grid-image
-    $boardUrl = $(this).attr('board-url');    // board-name attribute from .grid-image
-    document.getElementById("img-popup-board-name").innerText = $boardName; // <a id="img-popup-board-name" href="#">Board</a>
-    $('#img-popup-board-name').attr('href', $boardUrl);
+    // $boardUrl = $(this).attr('board-url');    // board-name attribute from .grid-image
+    document.getElementById("img-popup-board-name").innerText = $boardName; // <p id="img-popup-board-name">Board</p>
+    // $('#img-popup-board-name').attr('href', $boardUrl);
 
   });
 
