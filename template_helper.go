@@ -14,13 +14,13 @@ import (
 type TemplateModel struct {
 	OAuthURL      string
 	Authenticated bool
-	User          *TemplateUser
+	User          TemplateUser
 	Boards        []TemplateBoard
 	BoardMap      map[string]*TemplateBoard // for convinience.
 	Pins          []TemplatePin
 	Error         string
 	Message       string
-	UrlQuery      *TemplateUrlQuery
+	UrlQuery      TemplateUrlQuery
 	ImageSize     int
 }
 
@@ -50,21 +50,21 @@ type TemplateUrlQuery struct {
 	ImageResolution int
 }
 
-func IsBoardSelected(id string) bool {
-	return slices.Contains(tm.UrlQuery.Boards, id)
+func IsBoardSelected(boards []string, id string) bool {
+	return slices.Contains(boards, id)
 }
 
 func NewTemplateModel(authUrl string) *TemplateModel {
 	return &TemplateModel{
 		OAuthURL:      authUrl,
 		Authenticated: false,
-		User:          &TemplateUser{Name: "unknown", IconURL: "#", URL: "#"},
+		User:          TemplateUser{Name: "unknown", IconURL: "#", URL: "#"},
 		Boards:        nil,
 		BoardMap:      make(map[string]*TemplateBoard),
 		Pins:          nil,
 		Error:         "",
 		Message:       "",
-		UrlQuery:      &TemplateUrlQuery{},
+		UrlQuery:      TemplateUrlQuery{},
 		ImageSize:     3,
 	}
 }
@@ -73,7 +73,7 @@ func (tm *TemplateModel) Mock(uri *fasthttp.URI, clientBoards map[string]*Board)
 	tm.OAuthURL = ""
 	tm.Authenticated = true
 
-	tm.User = &TemplateUser{Name: "Iggy Zuk", IconURL: "https://iggyzuk.com/img/profile/iggy.jpg", URL: "#"}
+	tm.User = TemplateUser{Name: "Iggy Zuk", IconURL: "https://iggyzuk.com/img/profile/iggy.jpg", URL: "#"}
 
 	tm.ParseUrlQueries(uri, clientBoards)
 
@@ -141,6 +141,7 @@ func (tm *TemplateModel) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[str
 
 		tm.Boards = append(tm.Boards, newTemplateBoard)
 
+		// Store board pointer in our convinience map.
 		tm.BoardMap[newTemplateBoard.Id] = &newTemplateBoard
 
 		fmt.Printf("Board: %+v \n", val)

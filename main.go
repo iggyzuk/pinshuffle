@@ -13,7 +13,7 @@ import (
 )
 
 var client *PinterestClient
-var tm *TemplateModel
+
 var mock = false
 
 func main() {

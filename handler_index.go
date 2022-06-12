@@ -8,7 +8,7 @@ import (
 
 func indexHandler(c *fiber.Ctx) error {
 
-	tm = NewTemplateModel(client.GetAuthUri())
+	tm := NewTemplateModel(client.GetAuthUri())
 
 	if mock {
 
@@ -41,7 +41,7 @@ func indexHandler(c *fiber.Ctx) error {
 			if userErr != nil {
 				tm.Error = userErr.Error()
 			} else {
-				tm.User = &TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
+				tm.User = TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
 			}
 
 			// Real: fetch boards, process url, randomize.

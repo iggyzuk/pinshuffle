@@ -21,7 +21,7 @@ type PinterestClient struct {
 	Scopes             string
 	HttpClient         *http.Client
 	DefaultContentType string
-	AccessToken        string
+	AccessToken        string // TODO: isn't this gonna get overriden?
 }
 
 type AccessTokenResponse struct {
