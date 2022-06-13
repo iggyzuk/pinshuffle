@@ -42,13 +42,12 @@ func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 	pins := []Pin{}
 
 	for _, boardId := range rnd.BoardIds {
-		id := boardId
 
-		go func() {
+		go func(id string) {
 			newPins := rnd.FetchPinsFromBoard(rnd.ClientBoards[id])
 			pins = append(pins, newPins...)
 			wg.Done()
-		}()
+		}(boardId)
 
 		wg.Add(1)
 	}

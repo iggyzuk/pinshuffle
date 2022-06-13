@@ -163,12 +163,13 @@
                       <!--Card-->
                       <div class="row">
 
-                        {{ $boards := .UrlQuery.Boards }}
+                        {{ $selectedBoards := .UrlQuery.Boards }}
+
                         {{ range .Boards }}
 
                         <div class="col">
 
-                          {{ $checked := isBoardSelected $boards .Id }}
+                          {{ $checked := isBoardSelected $selectedBoards .Id }}
 
                           <div class="col btn-group btn-group-toggle text-nowrap p-1" data-toggle="buttons">
                             <label class="btn btn-outline-primary {{ if $checked }} active {{ end }}" for="{{ .Id }}">
@@ -185,31 +186,6 @@
 
                 </div>
               </div>
-            </div>
-
-            <!-- List Group -->
-            <div class="list-group">
-
-              {{/* {{ if len ( .Boards ) }}
-              <div class="list-group-item bg-success">Your Boards:</div>
-              {{ end }} */}}
-
-              <!-- OLD list boards -->
-              {{/* {{ $boards := .UrlQuery.Boards }}
-              {{ range .Boards }}
-              <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if isBoardSelected $boards .Id }} checked {{ end }}/> 
-              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} </label>
-              {{ end }} */}}
-
-              {{/* {{ if len ( .FollowedBoards ) }}
-              <div class="list-group-item bg-success">Followed Boards:</div>
-              {{ end }}
-
-              {{ range .FollowedBoards }}
-              <input type="checkbox" name="b" value="{{ .Id }}" id="{{ .Id }}" />
-              <label class="list-group-item" for="{{ .Id }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
-              {{ end }} */}}
-
             </div>
 
           </div>

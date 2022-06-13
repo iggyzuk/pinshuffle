@@ -8,51 +8,47 @@ import (
 
 func indexHandler(c *fiber.Ctx) error {
 
-	var client = NewClient()
-	var tm = NewTemplateModel(client.GetAuthUri())
+	var pinClient = NewClient()
+	var tmplController = NewTemplateController(pinClient.GetAuthUri())
 
 	if mock {
 
 		// Mock: create fake data, process url.
 
-		var mockBoards = make(map[string]*Board)
-
-		mockBoards["visual-style"] = &Board{Id: "visual-style", Name: "Visual Style"}
-		mockBoards["ideas"] = &Board{Id: "ideas", Name: "Ideas"}
-		mockBoards["concepts"] = &Board{Id: "concepts", Name: "Concepts"}
-
-		tm.Mock(c.Context().URI(), mockBoards)
-
-		// No need to use the randomizer – we forcefull put template-pins into the template-model.
+		tmplController.Mock(c.Context().URI())
 
 	} else {
 
 		var cookie = c.Cookies("access_token")
 
 		if len(cookie) == 0 {
-			log.Println("Missing Cookie")
-			tm.Message = "💭 Waiting for access to Pinterest account"
-			tm.Authenticated = false
-		} else {
-			log.Println("Cookie Exists")
-			client.AccessToken = cookie
-			tm.Authenticated = true
 
-			user, userErr := client.FetchUserAccount()
-			if userErr != nil {
-				tm.Error = userErr.Error()
-			} else {
-				tm.User = TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
-			}
+			// Real: but not authenticated, just show an error.
+
+			log.Println("Missing Cookie")
+			tmplController.Model.Message = "💭 Waiting for access to Pinterest account"
+			tmplController.Model.Authenticated = false
+		} else {
 
 			// Real: fetch boards, process url, randomize.
 
+			log.Println("Cookie Exists")
+			pinClient.AccessToken = cookie
+			tmplController.Model.Authenticated = true
+
+			user, userErr := pinClient.FetchUserAccount()
+			if userErr != nil {
+				tmplController.Model.Error = userErr.Error()
+			} else {
+				tmplController.Model.User = TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
+			}
+
 			var clientBoards = make(map[string]*Board)
 
-			var fetchedClientBoards, err = client.FetchBoards()
+			var fetchedClientBoards, err = pinClient.FetchBoards()
 
 			if err != nil {
-				tm.Error = err.Error()
+				tmplController.Model.Error = err.Error()
 			} else {
 				for _, board := range fetchedClientBoards.Items {
 					clientBoards[board.Id] = &Board{Id: board.Id, Name: board.Name} // TODO: why do we need to copy it? (probably cause it's an iterator value)
@@ -60,33 +56,27 @@ func indexHandler(c *fiber.Ctx) error {
 			}
 
 			if len(clientBoards) == 0 {
-				tm.Message = "💭 No boards found"
+				tmplController.Model.Message = "💭 No boards found"
 			}
 
-			parseErr := tm.ParseUrlQueries(c.Context().URI(), clientBoards)
+			parseErr := tmplController.ParseUrlQueries(c.Context().URI(), clientBoards)
 			if parseErr != nil {
 				return parseErr
 			}
 
 			// Randomize – if there are any url-specified boards.
-			if len(tm.UrlQuery.Boards) > 0 {
+			if len(tmplController.Model.UrlQuery.Boards) > 0 {
 
-				randomizedPins := NewRandomizer(client, clientBoards).GetRandomizedPins(tm.UrlQuery.Max, tm.UrlQuery.Boards)
+				randomizer := NewRandomizer(pinClient, clientBoards)
+				randomizedPins := randomizer.GetRandomizedPins(tmplController.Model.UrlQuery.Max, tmplController.Model.UrlQuery.Boards)
 
 				for _, randomizedPin := range randomizedPins {
-					tm.Pins = append(tm.Pins, TemplatePin{
-						Id:       randomizedPin.Id,
-						Name:     randomizedPin.Title,
-						Color:    randomizedPin.DominantColor,
-						ImageURL: GetImageResolution(tm.UrlQuery.ImageResolution, randomizedPin.Media.Images).Url,
-						AltText:  randomizedPin.AltText,
-						Board:    tm.BoardMap[randomizedPin.BoardId],
-					})
+					tmplController.AddPin(&randomizedPin)
 				}
 			}
 		}
 	}
 
 	// Render the HTML page.
-	return c.Render("layout", tm)
+	return c.Render("layout", tmplController.Model)
 }

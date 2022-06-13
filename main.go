@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -25,16 +24,8 @@ func main() {
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
-	engine.AddFunc("upper", strings.ToUpper)
 	engine.AddFunc("isBoardSelected", IsBoardSelected)
-	engine.AddFunc("Iterate", func(count int) []int {
-		var i int
-		var Items []int
-		for i = 0; i < (count); i++ {
-			Items = append(Items, i)
-		}
-		return Items
-	})
+	engine.AddFunc("Iterate", Iterate)
 
 	// Delims sets the action delimiters to the specified strings
 	engine.Delims("{{", "}}") // Optional. Default: engine delimiters
