@@ -27,6 +27,14 @@ func main() {
 	engine := html.New("./templates", ".gohtml")
 	engine.AddFunc("upper", strings.ToUpper)
 	engine.AddFunc("isBoardSelected", IsBoardSelected)
+	engine.AddFunc("Iterate", func(count int) []int {
+		var i int
+		var Items []int
+		for i = 0; i < (count); i++ {
+			Items = append(Items, i)
+		}
+		return Items
+	})
 
 	// Delims sets the action delimiters to the specified strings
 	engine.Delims("{{", "}}") // Optional. Default: engine delimiters

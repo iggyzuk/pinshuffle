@@ -86,4 +86,5 @@ $(function () {
   $("#img-popup").on('click', function(){
     $('#img-popup').modal('hide');
   });
+
 });
