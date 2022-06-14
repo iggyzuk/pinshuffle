@@ -164,12 +164,13 @@
                       <div class="row">
 
                         {{ $selectedBoards := .UrlQuery.Boards }}
+                        {{ $sortedBoards := SortBoards .Boards }}
 
-                        {{ range .Boards }}
+                        {{ range $sortedBoards }}
 
                         <div class="col">
 
-                          {{ $checked := isBoardSelected $selectedBoards .Id }}
+                          {{ $checked := IsBoardSelected $selectedBoards .Id }}
 
                           <div class="col btn-group btn-group-toggle text-nowrap p-1" data-toggle="buttons">
                             <label class="btn btn-outline-primary {{ if $checked }} active {{ end }}" for="{{ .Id }}">

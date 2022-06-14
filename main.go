@@ -24,7 +24,8 @@ func main() {
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
-	engine.AddFunc("isBoardSelected", IsBoardSelected)
+	engine.AddFunc("IsBoardSelected", IsBoardSelected)
+	engine.AddFunc("SortBoards", SortBoards)
 	engine.AddFunc("Iterate", Iterate)
 
 	// Delims sets the action delimiters to the specified strings
