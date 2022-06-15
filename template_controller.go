@@ -175,6 +175,7 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 	}
 
 	tc.Model.Message = "Mock"
+	tc.Model.Error = "This is an example error!"
 }
 
 func (tc *TemplateController) MockBoard(boards map[string]*Board, id string) *Board {

@@ -11,12 +11,6 @@ function main () {
 
   applyTheme(getCookie(selectedThemeKey))
 
-  // Enable all tooltips.
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-
   // Init packery.
   var elem = document.querySelector('.grid');
   var pckry = new Packery( elem, {
@@ -54,14 +48,6 @@ function main () {
       // Set image.
       const imagePopupSource = document.getElementById('img-popup-src');
       imagePopupSource.setAttribute("src", gridImage.getAttribute('src'));
-
-      console.log(tooltipList)
-
-      // Forece hide all tooltips.
-      tooltipList.forEach(element => {
-        element.hide();
-      });
-
     });
   }
 
