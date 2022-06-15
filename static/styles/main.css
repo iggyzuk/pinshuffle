@@ -7,6 +7,7 @@ body {
 }
 
 .grid-item {
+  position: relative;
   float: left;
   width: 150px;
   height: 150px;
@@ -32,8 +33,6 @@ body {
 
 .pin-badge {
   position: absolute; 
-  max-width: 130px;
-  display: block;
   z-index: 1; 
   opacity: 0;
   pointer-events: none;

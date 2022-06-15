@@ -102,10 +102,10 @@
     <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
-        <div class="d-flex justify-content-center align-items-center w-100 h-100" style="position:absolute;">
-          <span class="pin-badge text-truncate badge bg-primary">{{ .Board.Name }}</span>
+        <div class="pin-badge d-flex justify-content-center align-items-center w-100 h-100">
+          <span class="text-truncate badge bg-primary">{{ .Board.Name }}</span>
         </div>
-        <img class="grid-image" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}" board-name="{{ .Board.Name }}"/>
+        <img class="grid-image" loading="lazy" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.co.uk/pin/{{ .Id }}" board-name="{{ .Board.Name }}"/>
       </div>
       {{ end }}
     </div>
