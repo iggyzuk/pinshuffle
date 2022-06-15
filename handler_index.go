@@ -11,6 +11,8 @@ func indexHandler(c *fiber.Ctx) error {
 	var pinClient = NewClient()
 	var tmplController = NewTemplateController(pinClient.GetAuthUri())
 
+	// TODO: every time anyone goes to / we check this? can we use a strategy pattern?
+
 	if mock {
 
 		// Mock: create fake data, process url.
@@ -40,7 +42,11 @@ func indexHandler(c *fiber.Ctx) error {
 			if userErr != nil {
 				tmplController.Model.Error = userErr.Error()
 			} else {
-				tmplController.Model.User = TemplateUser{Name: user.Username, IconURL: user.ProfileImage, URL: user.WebsiteURL}
+				tmplController.Model.User = TemplateUser{
+					Name:    user.Username,
+					IconURL: user.ProfileImage,
+					URL:     user.WebsiteURL,
+				}
 			}
 
 			var clientBoards = make(map[string]*Board)

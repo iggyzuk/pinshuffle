@@ -58,7 +58,7 @@ func NewTemplateController(authUrl string) *TemplateController {
 		Model: TemplateModel{
 			OAuthURL:      authUrl,
 			Authenticated: false,
-			User:          TemplateUser{Name: "unknown", IconURL: "#", URL: "#"},
+			User:          TemplateUser{},
 			Boards:        make(map[string]*TemplateBoard),
 			Pins:          nil,
 			Error:         "",
@@ -129,31 +129,31 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 
 	var clientBoards = make(map[string]*Board)
 
-	tc.MockBoard(clientBoards, "A")
-	tc.MockBoard(clientBoards, "AB")
-	tc.MockBoard(clientBoards, "ABC")
-	tc.MockBoard(clientBoards, "ABCD")
-	tc.MockBoard(clientBoards, "ABCDE")
-	tc.MockBoard(clientBoards, "ABCDEF")
-	tc.MockBoard(clientBoards, "ABCDEFG")
-	tc.MockBoard(clientBoards, "ABCDEFGHI")
-	tc.MockBoard(clientBoards, "ABCDEFGHIJ")
-	tc.MockBoard(clientBoards, "ABCDEFGHIJK")
-	tc.MockBoard(clientBoards, "1")
-	tc.MockBoard(clientBoards, "12")
-	tc.MockBoard(clientBoards, "123")
-	tc.MockBoard(clientBoards, "1234")
-	tc.MockBoard(clientBoards, "12345")
-	tc.MockBoard(clientBoards, "123456")
-	tc.MockBoard(clientBoards, "1234567")
-	tc.MockBoard(clientBoards, "12345678")
-	tc.MockBoard(clientBoards, "123456789")
-	tc.MockBoard(clientBoards, "1234567890")
-	tc.MockBoard(clientBoards, "Visual Style")
-	tc.MockBoard(clientBoards, "Game Ideas")
-	tc.MockBoard(clientBoards, "Topologies")
-	tc.MockBoard(clientBoards, "2D Animations")
-	tc.MockBoard(clientBoards, "Animals")
+	tc.MockBoard(clientBoards, "visits")
+	tc.MockBoard(clientBoards, "insightful edge")
+	tc.MockBoard(clientBoards, "novel clocks")
+	tc.MockBoard(clientBoards, "misty rocks")
+	tc.MockBoard(clientBoards, "network")
+	tc.MockBoard(clientBoards, "beautiful long name")
+	tc.MockBoard(clientBoards, "last power")
+	tc.MockBoard(clientBoards, "essential")
+	tc.MockBoard(clientBoards, "strikebreaker")
+	tc.MockBoard(clientBoards, "punish reform")
+	tc.MockBoard(clientBoards, "tourists")
+	tc.MockBoard(clientBoards, "marine")
+	tc.MockBoard(clientBoards, "heavy")
+	tc.MockBoard(clientBoards, "computers")
+	tc.MockBoard(clientBoards, "pipe trance")
+	tc.MockBoard(clientBoards, "hammer")
+	tc.MockBoard(clientBoards, "connection")
+	tc.MockBoard(clientBoards, "fat")
+	tc.MockBoard(clientBoards, "monarch")
+	tc.MockBoard(clientBoards, "extreme zero")
+	tc.MockBoard(clientBoards, "possibility")
+	tc.MockBoard(clientBoards, "dressing")
+	tc.MockBoard(clientBoards, "off")
+	tc.MockBoard(clientBoards, "terminal")
+	tc.MockBoard(clientBoards, "slam dunk")
 
 	tc.ParseUrlQueries(uri, clientBoards)
 

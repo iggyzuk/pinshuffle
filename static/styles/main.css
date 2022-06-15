@@ -73,3 +73,12 @@ body {
   margin: auto;
   display: block;
 }
+
+.pin-badge {
+  position: relative; 
+  max-width: 100px;
+  display: block;
+  float: right; 
+  z-index: 1; 
+  margin: 2px; 
+}
