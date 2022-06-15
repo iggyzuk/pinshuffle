@@ -10,13 +10,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var mock = false
+var strategyFunc StrategyFunc
 
 func main() {
 
+	// Use real or mock index strategy when you find "-mock" argument
+	strategyFunc = GetTemplateModel
+
 	if len(os.Args) > 1 {
 		if os.Args[1] == "-mock" {
-			mock = true
+			strategyFunc = GetMockTemplateModel
 		}
 	}
 
