@@ -17,6 +17,7 @@ body {
 
 .grid-item:hover {
   border: 2px solid black;
+  cursor: pointer;
 }
 
 .grid-item .grid-image {
