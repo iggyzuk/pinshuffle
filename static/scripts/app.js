@@ -1,5 +1,3 @@
-// window.onload = main;
-
 window.addEventListener('load', (event) => {
   console.log('page is fully loaded');
   main()
@@ -9,7 +7,8 @@ const selectedThemeKey = 'selected_theme';
 
 function main () {
 
-  applyTheme(getCookie(selectedThemeKey))
+  var themeJson = JSON.parse(getCookie(selectedThemeKey));
+  applyTheme(themeJson.name, themeJson.link)
 
   // Init packery.
   var elem = document.querySelector('.grid');
@@ -56,8 +55,8 @@ function main () {
   for (const themeButton of themeButtons) {
     themeButton.addEventListener('click', event => {
       const theme = themeButton.getAttribute('data-theme');
-      saveTheme(theme);
-      applyTheme(theme);
+      saveTheme(themeButton.innerHTML, theme);
+      applyTheme(themeButton.innerHTML, theme);
     });
   }
 
@@ -80,12 +79,15 @@ function main () {
   }
 }
 
-function saveTheme(theme) {
-  setCookie(selectedThemeKey, theme, 365)
+function saveTheme(name, link) {
+  setCookie(selectedThemeKey, JSON.stringify({name: name, link: link}), 365)
 }
 
-function applyTheme(theme) {
-  if (theme != "") {
-    document.getElementById('theme').setAttribute('href', theme);
+function applyTheme(name, link) {
+  if (name != "" && link != "") {
+    document.getElementById('theme').setAttribute('href', link);
+
+    const themeDropdown = document.getElementById('theme-dropdown');
+    themeDropdown.innerHTML = name;
   }
 }

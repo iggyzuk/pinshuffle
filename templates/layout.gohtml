@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="static/styles/main.css">
 
   <!-- JavaScript Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/2.1.2/packery.pkgd.min.js"></script>
   <script src="static/scripts/app.js"></script>
   <script src="static/scripts/cookies.js"></script>
@@ -243,49 +243,35 @@
         <!-- Modal body -->
         <div class="modal-body">
 
-          <!-- Don't show user if the length of the username is zero -->
-          {{ if gt (len .User.Name) 0 }}
-
           <!-- User profile -->
           <div class="d-flex justify-content-center">
+
+            <div class="dropdown p-2">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="theme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Theme
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/sketchy.min.css">Sketchy</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/slate.min.css">Slate</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/solar.min.css">Solar</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/lumen.min.css">Lumen</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/super-hero.min.css">Superhero</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/space-lab.min.css">Space Lab</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/materia.min.css">Materia</button></li>
+              </ul>
+            </div>
+
+            <!-- Don't show user if the length of the username is zero -->
+            {{ if gt (len .User.Name) 0 }}
+
             <span class="p-2">
               <img src="{{ .User.IconURL }}" class="rounded-circle mx-2 border border-secondary" style="width: 32px; height:32px;"/>
               <a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a>
             </span>
             <button id="log-out-button" class="p-2 btn btn-danger m-1" type="button" > 👞 Logout</button>
-          </div>
-
-          <hr/>
-
-          {{ end }}
-        
-          {{/* <div class="d-flex justify-content-between"> */}}
-
-          <div class="row">
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/sketchy.min.css" > ✏️ Sketchy</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/slate.min.css" > 🎬 Slate</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/lumen.min.css" > ◈ Lumen</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/super-hero.min.css" > 🚀 Superhero</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/solar.min.css" > Solar</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/space-lab.min.css" > Space Lab</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/materia.min.css" > Materia</button>
-            </div>
-            <div class="col">
-              <button type="button" class="theme-button btn btn-warning m-1" data-theme="static/styles/sketchy.min.css" > ?</button>
-            </div>
+          
+            {{ end }}
+          
           </div>
 
           <hr class="my-4">
