@@ -7,14 +7,11 @@ const selectedThemeKey = 'selected_theme';
 
 function main () {
 
-  var themeJson = "";
-
   try {
-    themeJson = JSON.parse(getCookie(selectedThemeKey));
+    var themeJson = JSON.parse(getCookie(selectedThemeKey));
+    applyTheme(themeJson.name, themeJson.link);
   } catch (e) {
     console.log("Could not parse selected-theme JSON from cookie.")
-  } finally {
-    applyTheme(themeJson.name, themeJson.link);
   }
 
   // Init packery.
