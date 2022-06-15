@@ -170,7 +170,7 @@
 
                   <div class="col text-nowrap p-1 d-flex justify-content-center">
                     <input type="checkbox" class="btn-check" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if $checked }} checked="checked" {{ end }} autocomplete="off">
-                    <label class="btn btn-outline-primary" for="{{ .Id }}"> {{ .Name }}</label>
+                    <label class="btn btn-outline-primary m-0 px-2 py-1" for="{{ .Id }}"> {{ .Name }}</label>
                   </div>
 
                   {{ end }}
@@ -187,7 +187,7 @@
 
         <!-- Board Modal Footer -->
 
-        <div class="row px-3 pb-3 text-center">          
+        <div class="row px-2 py-1 text-center">          
 
             <!-- Max Input -->
             <div class="col-sm-4">
@@ -245,33 +245,38 @@
         <div class="modal-body">
 
           <!-- User profile -->
-          <div class="d-flex justify-content-center">
+          <div class="d-flex justify-content-around align-items-center">
 
-            <div class="dropdown p-2">
+            <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="theme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Theme
               </button>
               <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/sketchy.min.css">Sketchy</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/litera.min.css">Litera</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/slate.min.css">Slate</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/darkly.min.css">Darkly</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/solar.min.css">Solar</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/lumen.min.css">Lumen</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/super-hero.min.css">Superhero</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/space-lab.min.css">Space Lab</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/materia.min.css">Materia</button></li>
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/vapor.min.css">Vapor</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/journal.min.css">Journal</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/quartz.min.css">Quartz</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/slate.min.css">Slate</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/lumen.min.css">Lumen</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/super-hero.min.css">Superhero</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/space-lab.min.css">Space Lab</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/materia.min.css">Materia</button></li> */}}
               </ul>
             </div>
 
             <!-- Don't show user if the length of the username is zero -->
             {{ if gt (len .User.Name) 0 }}
 
-            <span class="p-2">
+            <span>
               <img src="{{ .User.IconURL }}" class="rounded-circle mx-2 border border-secondary" style="width: 32px; height:32px;"/>
               <a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a>
             </span>
-            <button id="log-out-button" class="p-2 btn btn-danger m-1" type="button" > 👞 Logout</button>
+
+            <button id="log-out-button" class="btn btn-danger" type="button" > 👞 Logout</button>
           
             {{ end }}
           

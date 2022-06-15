@@ -8,7 +8,9 @@ const selectedThemeKey = 'selected_theme';
 function main () {
 
   var themeJson = JSON.parse(getCookie(selectedThemeKey));
-  applyTheme(themeJson.name, themeJson.link)
+  if(themeJson.name != null && themeJson.link != null) {
+    applyTheme(themeJson.name, themeJson.link);
+  }
 
   // Init packery.
   var elem = document.querySelector('.grid');
