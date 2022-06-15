@@ -7,8 +7,13 @@ const selectedThemeKey = 'selected_theme';
 
 function main () {
 
-  var themeJson = JSON.parse(getCookie(selectedThemeKey));
-  if(themeJson.name != null && themeJson.link != null) {
+  var themeJson = "";
+
+  try {
+    themeJson = JSON.parse(getCookie(selectedThemeKey));
+  } catch (e) {
+    console.log("Could not parse selected-theme JSON from cookie.")
+  } finally {
     applyTheme(themeJson.name, themeJson.link);
   }
 
