@@ -1,11 +1,9 @@
 * { box-sizing: border-box; }
 
-/* force scrollbar, prevents initial gap */
-html { overflow-y: scroll; }
-
 body {
   margin: 0;
   padding: 0;
+  overflow-y: auto;
 }
 
 .grid-item {

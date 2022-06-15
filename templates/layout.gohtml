@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon/favicon-16x16.png">
   <link rel="manifest" href="static/images/favicon/site.webmanifest">
-  <link rel="stylesheet" id="theme" href="static/styles/sketchy.min.css">
+  <link rel="stylesheet" id="theme" href="static/styles/themes/sketchy.min.css">
   <link rel="stylesheet" href="static/styles/main.css">
 
   <!-- JavaScript Bundle with Popper -->
@@ -30,7 +30,7 @@
 
    <!-- Image Popup Modal -->
     <div class="modal fade" id="img-popup" data-backdrop="static" data-keyboard="false">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog"> <!-- modal-dialog-centered -->
         <div class="modal-content">
 
           <!-- Image Popup Header -->
@@ -112,17 +112,21 @@
 
     <!-- Bottom buttons -->
     <div class="fixed-bottom">
-      <div class="float-end" style="width: 200px;">
+      <div class="float-end text-nowrap text-center align-middle" style="width: 200px;">
 
         <!-- THE SHUFFLE BUTTON -->
         <div class="row m-1">
-          <button id="shuffle-button" type="button" class="btn btn-danger col">🎲 Shuffle <span class="badge bg-light rounded-pill">{{ len .Pins }}</span></button>
+          <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light rounded-pill">{{ len .Pins }}</span></button>
         </div>
 
         <!-- Boards & Settings -->
         <div class="row m-1">
-          <button type="button" class="btn btn-secondary col-9" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light rounded-pill">{{ len .Boards }}</span></button>
-          <button type="button" class="btn btn-outline-primary col-3" data-bs-toggle="modal" data-bs-target="#settings-modal">⚙️</button>
+          <button type="button" class="btn btn-secondary col-9 p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light rounded-pill">{{ len .Boards }}</span></button>
+          <button type="button" class="btn btn-outline-primary col-3 p-1" data-bs-toggle="modal" data-bs-target="#settings-modal">
+            <div class="text-align-middle" style="font-size:14px;">
+              <span>⚙️</span>
+            </div>
+          </button>
         </div>
 
       </div>
@@ -166,7 +170,7 @@
 
                   <div class="col text-nowrap p-1 d-flex justify-content-center">
                     <input type="checkbox" class="btn-check" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if $checked }} checked="checked" {{ end }} autocomplete="off">
-                    <label class="btn btn-outline-primary {{ if $checked }} active {{ end }}" for="{{ .Id }}"> {{ .Name }}</label>
+                    <label class="btn btn-outline-primary" for="{{ .Id }}"> {{ .Name }}</label>
                   </div>
 
                   {{ end }}
@@ -182,43 +186,40 @@
         </div>
 
         <!-- Board Modal Footer -->
-        <div class="p-3">
 
-          <div class="d-flex justify-content-between">          
+        <div class="row px-3 pb-3 text-center">          
 
-              <!-- Max Input -->
-              <div class="d-flex justify-content-between pr-2">
-                <label class="align-self-center pr-2" for="max">Max</label>
-                <input
-                  id="max"
-                  class="form-control align-self-center"
-                  type="number"
-                  name="max"
-                  min="0"
-                  max="10000"
-                  type="text"
-                  placeholder="Total Pins"
-                  value={{.UrlQuery.Max}} />
-              </div>
-
-              <div class="d-flex justify-content-between pr-2">
-                <label class="align-self-center pr-2" for="resolution">Resolution </label>
-
-                <!-- Resolution Input -->
-                <select class="form-control align-self-center" id="res" name="res">
-                  <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
-                  <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
-                  <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
-                  <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
-                  <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
-                </select>
-              </div>
-
-            <!-- Submit the form -->
-            <div class="w-25">
-              <button type="submit" class="btn btn-success align-self-center w-100">Go!</button>
+            <!-- Max Input -->
+            <div class="col-sm-4">
+              <label for="max">Max</label>
+              <input
+                id="max"
+                class="form-control p-2"
+                type="number"
+                name="max"
+                min="0"
+                max="10000"
+                type="text"
+                placeholder="Total Pins"
+                value={{.UrlQuery.Max}} />
             </div>
 
+            <div class="col-sm-4">
+              <label for="resolution">Resolution </label>
+
+              <!-- Resolution Input -->
+              <select class="form-control p-2" id="res" name="res">
+                <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
+                <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
+                <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
+                <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
+                <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
+              </select>
+            </div>
+
+          <!-- Submit the form -->
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-success w-100 h-100">Go!</button>
           </div>
 
         </div>
@@ -251,13 +252,15 @@
                 Theme
               </button>
               <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/sketchy.min.css">Sketchy</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/slate.min.css">Slate</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/solar.min.css">Solar</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/lumen.min.css">Lumen</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/super-hero.min.css">Superhero</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/space-lab.min.css">Space Lab</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/materia.min.css">Materia</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/sketchy.min.css">Sketchy</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/litera.min.css">Litera</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/slate.min.css">Slate</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/solar.min.css">Solar</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/lumen.min.css">Lumen</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/super-hero.min.css">Superhero</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/space-lab.min.css">Space Lab</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/materia.min.css">Materia</button></li>
               </ul>
             </div>
 
