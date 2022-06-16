@@ -2,142 +2,191 @@
 <html lang="en">
 
 <head>
-  <title>Shuffle – Pinterest Board Randomizer</title>
+  <title>Pinshuffle – Pinterest Board Randomizer</title>
   <meta charset="utf-8">
 
-  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <meta name="theme-color" content="#111111" />
   <meta name="description" content="Pinterest Board Randomizer">
-  <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity">
+  <meta name="keywords" content="Pinterest, Shuffle, Random, Pin, Creativity, Pinshuffle">
   <meta name="author" content="Iggy Zuk">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png">
-  <link rel="manifest" href="/img/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="static/images/favicon/site.webmanifest">
+  <link rel="stylesheet" id="theme" href="static/styles/themes/morph.min.css">
+  <link rel="stylesheet" href="static/styles/main.css">
 
-  <link rel="stylesheet" href="/style/main.css">
-  <link rel="stylesheet" href="/style/checkbox.css">
-  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css">
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/2.1.2/packery.pkgd.min.js"></script>
-  <script src="/script.js"></script>
+  <script src="static/scripts/app.js"></script>
+  <script src="static/scripts/cookies.js"></script>
+  <script src="static/scripts/shuffle.js"></script>
 </head>
 
 <body>
+
+   <!-- Image Popup Modal -->
+    <div class="modal fade" id="img-popup" data-bs-dismiss="modal" data-keyboard="false">
+      <div class="modal-dialog"> <!-- modal-dialog-centered -->
+        <div class="modal-content">
+
+          <!-- Image Popup Header -->
+          <div class="row justify-content-start">
+
+            <!-- Board Badge -->
+            <div class="col-4 d-flex justify-content-start">
+              <div class="badge bg-secondary m-2 align-self-center">
+                <span id="img-popup-board-name" href="#" target="_blank">Board</span>
+              </div>
+            </div>
+
+            <!-- Open Pin -->
+            <div class="col-4 d-flex justify-content-center">
+              <a href="#open-pin-link" target="_blank" id="img-popup-pin-name" class="btn btn-xs btn-outline-primary m-1 w-100 font-weight-bold p-2" role="button">Open Pin</a>
+            </div>
+
+            <!-- Open Pin -->
+            <div class="col-4 d-flex justify-content-end align-items-center">
+              <button type="button" class="btn-close p-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+          </div>
+
+          <!-- Zoomed in Image -->
+          <div class="px-1 pb-1">
+            <img id="img-popup-src" class="rounded" src="#"/>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
   <div class="container-fluid p-1">
 
     {{ if not .Authenticated }}
 
     <!-- Intro Modal -->
-    <div class="modal fade" id="intro-modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" id="intro-modal" data-bs-backdrop="static" data-keyboard="false">
       <div class="modal-dialog">
         <div class="modal-content">
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">🃏 Shuffle Your Pinterest Boards</h4>
+            <h4 class="modal-title">◈ Shuffle Your Pinterest Boards</h4>
           </div>
 
           <!-- Modal body -->
           <div class="modal-body">
-            <div class="alert alert-warning" role="alert">
-              Shuffle is currently broken due Pinterest API getting deprecated. It will get fixed when the new version becomes available.
-            </div>
-            <p class="lead"><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
-            <!-- <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/">Pinterest</a>.</p>
-            <p class="small">By continuing you agree for Shuffle to store cookies for login info and selected theme.</p> -->
+            <p class="lead"><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/" target="_blank">Pinterest</a> boards and shuffles them around. It does not modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
+            <p>To start, please <button onclick='window.location.href = "{{ .OAuthURL }}"' class="btn btn-primary m-1" type="submit">Sign in</button> with <a href="https://pinterest.com/" target="_blank">Pinterest</a>.</p>
+            <p class="small">By continuing you agree for Pinshuffle to store cookies for access token and the selected theme.</p>
           </div>
 
         </div>
       </div>
     </div>
 
-    <!-- Show intro modal on load -->
-    <script type="text/javascript">
-      $(window).on('load',function(){
-          $('#intro-modal').modal('show');
-      });
-    </script>
     {{ end }}
 
     {{ if .Error }}
-    <div class="alert alert-danger alert-dismissible fade show">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
       {{ .Error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {{ else if .Message }}
-    <div class="alert alert-primary alert-dismissible fade show">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ end }}
+    {{ if .Message }}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
       {{ .Message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{ end }}
 
     <div class="grid">
       {{ range .Pins }}
       <div class="grid-item">
-        <img class="grid-image" src="{{ .ImageURL }}" style="background-color:{{.Color}};"/>
-        <a class="pin" href="{{ .PinURL }}" target="_blank"><img src="/img/pin.png"/></a>
+        <div class="pin-badge d-flex justify-content-center align-items-center w-100 h-100">
+          <span class="text-truncate badge bg-primary">{{ .Board.Name }}</span>
+        </div>
+        <img class="grid-image" loading="lazy" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" pin-name="{{ .Name }}" pin-url="https://www.pinterest.com/pin/{{ .Id }}" board-name="{{ .Board.Name }}"/>
       </div>
       {{ end }}
     </div>
 
     <!-- Bottom buttons -->
-    <div class="fixed-bottom content p-1">
-      <div>
-        <button type="button" class="float-left btn btn-outline-primary btn-lg m-1" data-toggle="modal" data-target="#info-modal">ⓘ Info</button>
+    <div class="position-fixed bottom-0 end-0" id="shuffle-deck">
+      <div class="text-nowrap text-center align-middle p-1">
 
-        <button id="shuffle-button" type="button" class="float-right btn btn-danger btn-lg m-1">🎲 Shuffle <span class="badge badge-light badge-pill">{{ len .Pins }}</span></button>
+        <!-- THE SHUFFLE BUTTON -->
+        <div class="row m-0 pb-1">
+          <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light p-1">{{ len .Pins }}</span></button>
+        </div>
 
-        <button type="button" class="float-right btn btn-secondary btn-lg m-1" data-toggle="modal" data-target="#boards-modal">⌗ Boards <span class="badge badge-light badge-pill">{{ .TotalBoards }}</span></button>
+        <!-- Boards & Settings -->
+        <div class="row g-1">
+          <div class="col-9">
+           <button type="button" class="btn btn-secondary w-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light p-1">{{ len .Boards }}</span></button>
+          </div>
+          <div class="col-3">
+            <button type="button" class="w-100 h-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#settings-modal">
+              <div class="text-align-middle" style="font-size:14px;">
+                <span>⚙️</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
-
   </div>
+
+  {{/* <p>The Name of the Pin!</p> */}}
 
   <form action="/" method="get">
 
   <!-- Boards Modal -->
   <div class="modal fade" id="boards-modal">
-    <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
       <div class="modal-content">
 
         <!-- Board Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">⌗ Boards</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">📒 Boards <span class="badge bg-secondary">{{ len .Boards }}</span></h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-
 
         <!-- Board Modal Body -->
         <div class="modal-body">
 
           <div class="content">
 
-            <!-- List Group -->
-            <div class="list-group">
+            <!-- GRID -->
 
-              {{ if len ( .Boards ) }}
-              <div class="list-group-item bg-success">Your Boards:</div>
-              {{ end }}
+            <div class="row justify-content-center">
 
-              {{ range .Boards }}
-              <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
-              <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
-              {{ end }}
+              <div class="col">
 
-              {{ if len ( .FollowedBoards ) }}
-              <div class="list-group-item bg-success">Followed Boards:</div>
-              {{ end }}
+                <div class="row">
 
-              {{ range .FollowedBoards }}
-              <input type="checkbox" name="b" value="{{ .URL }}" id="{{ .URL }}" />
-              <label class="list-group-item" for="{{ .URL }}">{{ .Name }} <span class="float-right badge badge-danger badge-pill">{{ .PinCoint }}</span></label>
-              {{ end }}
+                  {{ $selectedBoards := .UrlQuery.Boards }}
+                  {{ $sortedBoards := SortBoards .Boards }}
+
+                  {{ range $sortedBoards }}
+
+                  {{ $checked := IsBoardSelected $selectedBoards .Id }}
+
+                  <div class="col text-nowrap p-1 d-flex justify-content-center">
+                    <input type="checkbox" class="btn-check" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if $checked }} checked="checked" {{ end }} autocomplete="off">
+                    <label class="btn btn-outline-primary m-0 px-2 py-1" for="{{ .Id }}"> {{ .Name }}</label>
+                  </div>
+
+                  {{ end }}
+
+                </div>
+
+              </div>
 
             </div>
 
@@ -146,20 +195,41 @@
         </div>
 
         <!-- Board Modal Footer -->
-        <div class="modal-footer">
 
-          <input
-            class="form-control"
-            type="number"
-            name="max"
-            min="0"
-            max="10000"
-            type="text"
-            placeholder="Total Pins"
-            value="100" />
+        <div class="row px-2 py-1 text-center">          
+
+            <!-- Max Input -->
+            <div class="col-4">
+              <label for="max">Max</label>
+              <input
+                id="max"
+                class="form-control p-2"
+                type="number"
+                name="max"
+                min="0"
+                max="10000"
+                type="text"
+                placeholder="Total Pins"
+                value={{.UrlQuery.Max}} />
+            </div>
+
+            <div class="col-4">
+              <label for="resolution">Resolution </label>
+
+              <!-- Resolution Input -->
+              <select class="form-control p-2" id="res" name="res">
+                <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Small</option>
+                <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
+                <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>Large</option>
+                <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Huge</option>
+                <option id="4" value="4" {{ if eq .UrlQuery.ImageResolution 4 }} selected="selected" {{ end }}>Original</option>
+              </select>
+            </div>
 
           <!-- Submit the form -->
-          <button type="submit" class="btn btn-danger">Go!</button>
+          <div class="col-4">
+            <button type="submit" class="btn btn-success w-100 h-100">Go!</button>
+          </div>
 
         </div>
 
@@ -169,50 +239,93 @@
 
   </form>
 
-  <!-- Info Modal -->
-  <div class="modal fade" id="info-modal">
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settings-modal">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
 
         <!-- Modal header -->
         <div class="modal-header">
-          <h4 class="modal-title">ⓘ Info</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">⚙️ Settings</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <!-- Modal body -->
         <div class="modal-body">
 
-          <div class="content">
-            <p><b>Shuffle</b> loads pins from <a href="https://pinterest.com/">Pinterest</a> and shuffles them around. It does <b>not</b> modify the original board in any way. The main purpose is to get re-inspired by older pins, and to get creative with visual associations.</p>
+          <!-- User profile -->
+          <div class="d-flex justify-content-around align-items-center">
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="theme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Theme
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/sketchy.min.css">Sketchy</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/materia.min.css">Materia</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/darkly.min.css">Darkly</button></li>
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/solar.min.css">Solar</button></li>
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/quartz.min.css">Quartz</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/space-lab.min.css">Space Lab</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/lumen.min.css">Lumen</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/litera.min.css">Litera</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/vapor.min.css">Vapor</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/journal.min.css">Journal</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/slate.min.css">Slate</button></li> */}}
+                {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/super-hero.min.css">Superhero</button></li> */}}
+              </ul>
+            </div>
+
+            <!-- Don't show user if the length of the username is zero -->
+            {{ if gt (len .User.Name) 0 }}
+
+            <div class="row text-center gx-2">
+              <div class="col">
+                <img src="{{ .User.IconURL }}" class="rounded-circle border border-secondary" style="width: 50px; height:50px;"/>
+              </div>
+              <div class="col d-flex justify-content-center align-items-center">
+                <a class="text-nowrap" href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a>
+              </div>
+            </div>
+
+            <button id="log-out-button" class="btn btn-danger text-nowrap" type="button" > ◈ Logout</button>
+          
+            {{ end }}
+          
           </div>
 
           <hr class="my-4">
 
-          <div class="list-group">
-            <dl><h5>👁 Theme:</h5></dl>
-            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/flatly/bootstrap.min.css" type="button" class="btn btn-light m-1">Light</button>
-            <button data-theme="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/darkly/bootstrap.min.css" type="button" class="btn btn-dark m-1">Dark</button>
-          </div>
-
-          <!-- Switch themes -->
-          <script>
-          $("button[data-theme]").click(function() {
-            setCookie("selected_theme", $(this).data("theme"), 365);
-            $("head link#theme").attr("href", $(this).data("theme"));
-          });
-
-          </script>
-
-          <hr class="my-4">
-
+          <!-- Description -->
           <div class="content">
-            <dl><h5>🔒 Privacy:</h5></dl>
-            <p>Cookies for access token and selected theme</p>
+            <p><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/" target="_blank">Pinterest</a> boards and shuffles them around. It does not modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
           </div>
 
-          <p class="small text-right">Made by <a href="https://twitter.com/IggyZuk/">Iggy Zuk</a></p>
-        </div>
+          <!-- Privacy -->
+          <div class="content">
+            <p><b>Privacy:</b> Cookies for access token and the selected theme.</p>
+          </div>
+
+          <hr/>
+
+          <div class="d-flex justify-content-around align-items-center">
+
+            <div class="w-50">
+              <p class="m-0">Code is publicly available, feel free to contribute.</p>
+              <div class="d-flex p-2 justify-content-center">
+                <a href="https://github.com/iggyzuk/shuffle/" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/iggyzuk/shuffle?style=social"></a>
+              </div>
+            </div>
+
+            <div class="h-100">
+              <p class="m-0 text-align-center">Made by Iggy Zuk</p>
+              <div class="d-flex p-2 justify-content-center">
+                <a href="https://twitter.com/IggyZuk/" target="_blank"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/iggyzuk?label=follow&style=social"></a>
+              </div>
+            </div>
+
+          </div>
 
       </div>
     </div>

@@ -1,12 +1,19 @@
-module github.com/iggyzuk/shuffle
+module pinshuffle
 
-go 1.16
+go 1.18
 
 require (
-	github.com/BrandonRomano/iso8601 v0.1.0 // indirect
-	github.com/BrandonRomano/wrecker v0.1.5 // indirect
-	github.com/gofiber/fiber/v2 v2.5.0
+	github.com/gofiber/fiber/v2 v2.34.0
 	github.com/gofiber/template v1.6.6
-	github.com/iggyzuk/go-pinterest v2.1.2-0.20210304054806-a4f9817db503+incompatible
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/joho/godotenv v1.4.0
+	github.com/valyala/fasthttp v1.37.0
+	golang.org/x/exp v0.0.0-20220609121020-a51bd0440498
+)
+
+require (
+	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/klauspost/compress v1.15.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/tcplisten v1.0.0 // indirect
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 )

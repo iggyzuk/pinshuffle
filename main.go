@@ -7,48 +7,61 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/html"
-	pinterest "github.com/iggyzuk/go-pinterest"
+	"github.com/joho/godotenv"
 )
 
-var tlsCertPath = os.Getenv("TLS_CERT_PATH")
-var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
-var clientID = os.Getenv("CLIENT_ID")
-var clientSecret = os.Getenv("CLIENT_SECRET")
-var rootURL = os.Getenv("ROOT_URL")
-var domainName = "shuffle.iggyzuk.com"
-
-var client *pinterest.Client
+var strategyFunc StrategyFunc
 
 func main() {
-	// http to https redirection
-	// go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
 
-	client = pinterest.NewClient()
+	// Use real or mock index strategy when you find "-mock" argument
+	strategyFunc = GetTemplateModel
+
+	if len(os.Args) > 1 {
+		if os.Args[1] == "-mock" {
+			strategyFunc = GetMockTemplateModel
+		}
+	}
+
+	godotenv.Load(".env")
 
 	// Initialize standard Go html template engine
 	engine := html.New("./templates", ".gohtml")
+	engine.AddFunc("IsBoardSelected", IsBoardSelected)
+	engine.AddFunc("SortBoards", SortBoards)
+	engine.AddFunc("Iterate", Iterate)
+
+	// Delims sets the action delimiters to the specified strings
+	engine.Delims("{{", "}}") // Optional. Default: engine delimiters
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
-	// Default middleware config
 	app.Use(logger.New())
 	app.Use("/monitor", monitor.New())
 
 	// Load static files like CSS, Images & JavaScript.
 	app.Static("/static", "./static")
 
-	app.Get("/", indexHandler)
-	app.Get("/redirect", pinterestRedirectHandler)
+	// If beta is defined use it!
+	beta := os.Getenv("BETA")
+	if len(beta) > 0 {
+		app.Get(beta, indexHandler)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Currently in Beta.")
+		})
+	} else {
+		app.Get("/", indexHandler)
+	}
+
+	app.Get("/redirect", authRedirectHandler)
 	app.Get("/privacy", privacyHandler)
 
 	// 404 handler.
 	app.Use(func(c *fiber.Ctx) error {
 		return c.SendStatus(404) // => 404 "Not Found"
 	})
-
-	// mux.Handle("/res/", http.StripPrefix("/res/", fs))
 
 	// Get port from env vars.
 	var port = os.Getenv("PORT")
@@ -60,8 +73,4 @@ func main() {
 
 	// Start server on http://${heroku-url}:${port}
 	app.Listen(":" + port)
-}
-
-func privacyHandler(c *fiber.Ctx) error {
-	return c.SendString("Pinhuffle only stores a cookies for login info and the selected theme.")
 }
