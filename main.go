@@ -44,7 +44,17 @@ func main() {
 	// Load static files like CSS, Images & JavaScript.
 	app.Static("/static", "./static")
 
-	app.Get("/", indexHandler)
+	// If beta is defined use it!
+	beta := os.Getenv("BETA")
+	if len(beta) > 0 {
+		app.Get(beta, indexHandler)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Currently in Beta.")
+		})
+	} else {
+		app.Get("/", indexHandler)
+	}
+
 	app.Get("/redirect", authRedirectHandler)
 	app.Get("/privacy", privacyHandler)
 
