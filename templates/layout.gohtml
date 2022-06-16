@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon/favicon-16x16.png">
   <link rel="manifest" href="static/images/favicon/site.webmanifest">
-  <link rel="stylesheet" id="theme" href="static/styles/themes/sketchy.min.css">
+  <link rel="stylesheet" id="theme" href="static/styles/themes/morph.min.css">
   <link rel="stylesheet" href="static/styles/main.css">
 
   <!-- JavaScript Bundle with Popper -->
@@ -29,7 +29,7 @@
 <body>
 
    <!-- Image Popup Modal -->
-    <div class="modal fade" id="img-popup" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" id="img-popup" data-bs-dismiss="modal" data-keyboard="false">
       <div class="modal-dialog"> <!-- modal-dialog-centered -->
         <div class="modal-content">
 
@@ -64,13 +64,13 @@
     {{ if not .Authenticated }}
 
     <!-- Intro Modal -->
-    <div class="modal fade" id="intro-modal" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" id="intro-modal" data-bs-backdrop="static" data-keyboard="false">
       <div class="modal-dialog">
         <div class="modal-content">
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">♦️ Shuffle Your Pinterest Boards</h4>
+            <h4 class="modal-title">◈ Shuffle Your Pinterest Boards</h4>
           </div>
 
           <!-- Modal body -->
@@ -116,16 +116,16 @@
 
         <!-- THE SHUFFLE BUTTON -->
         <div class="row m-0 pb-1">
-          <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light rounded-pill">{{ len .Pins }}</span></button>
+          <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light p-1">{{ len .Pins }}</span></button>
         </div>
 
         <!-- Boards & Settings -->
         <div class="row g-1">
           <div class="col-9">
-           <button type="button" class="btn btn-secondary w-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light rounded-pill">{{ len .Boards }}</span></button>
+           <button type="button" class="btn btn-secondary w-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light p-1">{{ len .Boards }}</span></button>
           </div>
           <div class="col-3">
-            <button type="button" class="w-100 h-100 p-1 btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#settings-modal">
+            <button type="button" class="w-100 h-100 btn btn-info p-1" data-bs-toggle="modal" data-bs-target="#settings-modal">
               <div class="text-align-middle" style="font-size:14px;">
                 <span>⚙️</span>
               </div>
@@ -148,7 +148,7 @@
 
         <!-- Board Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">📒 Boards <span class="badge bg-secondary rounded-pill">{{ len .Boards }}</span></h4>
+          <h4 class="modal-title">📒 Boards <span class="badge bg-secondary">{{ len .Boards }}</span></h4>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
@@ -256,10 +256,10 @@
                 Theme
               </button>
               <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
+                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/sketchy.min.css">Sketchy</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/litera.min.css">Litera</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/darkly.min.css">Darkly</button></li>
-                <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/solar.min.css">Solar</button></li>
                 {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/vapor.min.css">Vapor</button></li> */}}
                 {{/* <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/journal.min.css">Journal</button></li> */}}
