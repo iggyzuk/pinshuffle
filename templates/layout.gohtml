@@ -38,7 +38,7 @@
 
             <!-- Open Pin -->
             <div class="col-4 d-flex justify-content-center">
-              <a href="#open-pin-link" target="_blank" id="img-popup-pin-name" class="btn btn-xs btn-outline-primary m-1 w-100 font-weight-bold" role="button">Open Pin</a>
+              <a href="#open-pin-link" target="_blank" id="img-popup-pin-name" class="btn btn-xs btn-outline-primary m-1 w-100 font-weight-bold p-2" role="button">Open Pin</a>
             </div>
 
             <!-- Board Badge -->
@@ -111,22 +111,26 @@
     </div>
 
     <!-- Bottom buttons -->
-    <div class="position-fixed bottom-0 end-0" style="width: 200px;">
-      <div class="text-nowrap text-center align-middle">
+    <div class="position-fixed bottom-0 end-0" id="shuffle-deck">
+      <div class="text-nowrap text-center align-middle p-1">
 
         <!-- THE SHUFFLE BUTTON -->
-        <div class="row m-1">
+        <div class="row m-0 pb-1">
           <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light rounded-pill">{{ len .Pins }}</span></button>
         </div>
 
         <!-- Boards & Settings -->
-        <div class="row m-1">
-          <button type="button" class="btn btn-secondary col-9 p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light rounded-pill">{{ len .Boards }}</span></button>
-          <button type="button" class="btn btn-outline-primary col-3 p-1" data-bs-toggle="modal" data-bs-target="#settings-modal">
-            <div class="text-align-middle" style="font-size:14px;">
-              <span>⚙️</span>
-            </div>
-          </button>
+        <div class="row g-1">
+          <div class="col-9">
+           <button type="button" class="btn btn-secondary w-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light rounded-pill">{{ len .Boards }}</span></button>
+          </div>
+          <div class="col-3">
+            <button type="button" class="w-100 h-100 p-1 btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#settings-modal">
+              <div class="text-align-middle" style="font-size:14px;">
+                <span>⚙️</span>
+              </div>
+            </button>
+          </div>
         </div>
 
       </div>
@@ -276,7 +280,7 @@
               <a href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a>
             </span>
 
-            <button id="log-out-button" class="btn btn-danger" type="button" > 👞 Logout</button>
+            <button id="log-out-button" class="btn btn-danger" type="button" > ◈ Logout</button>
           
             {{ end }}
           
@@ -284,17 +288,35 @@
 
           <hr class="my-4">
 
+          <!-- Description -->
           <div class="content">
             <p><b>Pinshuffle</b> loads pins from <a href="https://pinterest.com/" target="_blank">Pinterest</a> boards and shuffles them around. It does not modify the original boards in any way. The main purpose of the app is to get re-inspired by older pins, and to get creative with visual associations.</p>
           </div>
 
+          <!-- Privacy -->
           <div class="content">
-            {{/* <dl><h5>🔒 Privacy:</h5></dl> */}}
             <p><b>Privacy:</b> Cookies for access token and the selected theme.</p>
           </div>
 
-          <p class="small text-right">Made by <a href="https://twitter.com/IggyZuk/" target="_blank">Iggy Zuk</a></p>
-        </div>
+          <hr/>
+
+          <div class="d-flex justify-content-around align-items-center">
+
+            <div class="w-50">
+              <p class="m-0">Code is publicly available, feel free to contribute.</p>
+              <div class="d-flex p-2 justify-content-center">
+                <a href="https://github.com/iggyzuk/shuffle/" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/iggyzuk/shuffle?style=social"></a>
+              </div>
+            </div>
+
+            <div class="h-100">
+              <p class="m-0 text-align-center">Made by Iggy Zuk</p>
+              <div class="d-flex p-2 justify-content-center">
+                <a href="https://twitter.com/IggyZuk/" target="_blank"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/iggyzuk?label=follow&style=social"></a>
+              </div>
+            </div>
+
+          </div>
 
       </div>
     </div>
