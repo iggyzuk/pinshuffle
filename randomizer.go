@@ -39,14 +39,20 @@ func (rnd *Randomizer) ProccessBoards(boardIds []string) {
 func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
 
 	wg := sync.WaitGroup{}
+	mux := sync.Mutex{}
 	pins := []Pin{}
 
 	for _, boardId := range rnd.BoardIds {
 
 		go func(id string) {
+			defer wg.Done()
+
 			newPins := rnd.FetchPinsFromBoard(rnd.ClientBoards[id])
+
+			mux.Lock()
 			pins = append(pins, newPins...)
-			wg.Done()
+			mux.Unlock()
+
 		}(boardId)
 
 		wg.Add(1)
