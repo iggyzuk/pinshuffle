@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
-	"sync"
 	"time"
 )
 
@@ -15,6 +15,11 @@ type Randomizer struct {
 	PinsPerBoard int
 }
 
+type PinsResult struct {
+	Pins  []Pin
+	Error error
+}
+
 func NewRandomizer(client *PinterestClient, clientBoards map[string]*Board) *Randomizer {
 	return &Randomizer{Client: client, ClientBoards: clientBoards}
 }
@@ -23,7 +28,7 @@ func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) []Pin {
 	rand.Seed(time.Now().UnixNano())
 	rnd.Max = max
 	rnd.ProccessBoards(boardIds)
-	return rnd.FetchAllPinsFromSelectedBoards()
+	return rnd.FetchPinsFromSelectedBoards()
 }
 
 func (rnd *Randomizer) ProccessBoards(boardIds []string) {
@@ -36,41 +41,42 @@ func (rnd *Randomizer) ProccessBoards(boardIds []string) {
 	}
 }
 
-func (rnd *Randomizer) FetchAllPinsFromSelectedBoards() []Pin {
+func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
 
-	wg := sync.WaitGroup{}
-	mux := sync.Mutex{}
-	pins := []Pin{}
+	resultChan := make(chan PinsResult)
 
 	for _, boardId := range rnd.BoardIds {
 
 		go func(id string) {
-			defer wg.Done()
-
-			newPins := rnd.FetchPinsFromBoard(rnd.ClientBoards[id])
-
-			mux.Lock()
-			pins = append(pins, newPins...)
-			mux.Unlock()
-
+			pins, err := rnd.FetchSomePinsFromBoard(rnd.ClientBoards[id])
+			resultChan <- PinsResult{Pins: pins, Error: err}
 		}(boardId)
-
-		wg.Add(1)
 	}
 
-	wg.Wait()
+	allPins := []Pin{}
 
-	return pins
+	for i := 0; i < len(rnd.BoardIds); i++ {
+
+		r := <-resultChan
+
+		if r.Error != nil {
+			log.Fatal(r.Error)
+			break
+		}
+		allPins = append(allPins, r.Pins...)
+	}
+
+	return allPins
 }
 
-func (rnd *Randomizer) FetchPinsFromBoard(board *Board) []Pin {
+func (rnd *Randomizer) FetchSomePinsFromBoard(board *Board) ([]Pin, error) {
 	fmt.Println("Fetching all pins from Board: " + board.Name)
 	allPins, err := rnd.Client.FetchAllPins(board)
 	if err != nil {
-		fmt.Println(err.Error())
+		return nil, err
 	}
 	trimmedPins := rnd.Trim(allPins, rnd.PinsPerBoard)
-	return trimmedPins
+	return trimmedPins, nil
 }
 
 func (rnd *Randomizer) Trim(pins []Pin, limit int) []Pin {
