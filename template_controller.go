@@ -186,13 +186,11 @@ func (tc *TemplateController) MockBoard(boards map[string]*Board, id string) *Bo
 
 func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[string]*Board) error {
 	queryString := string(uri.QueryString())
-	fmt.Println(queryString)
 
 	queryMap, err := url.ParseQuery(queryString)
 	if err != nil {
 		return err
 	}
-	fmt.Println(queryMap)
 
 	// Max.
 	tc.Model.UrlQuery.Max = 100
@@ -219,8 +217,6 @@ func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards ma
 		}
 	}
 
-	fmt.Printf("Query: %+v \n", tc.Model.UrlQuery)
-
 	for _, val := range clientBoards {
 
 		newTemplateBoard := &TemplateBoard{
@@ -229,8 +225,6 @@ func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards ma
 		}
 
 		tc.AddBoard(newTemplateBoard)
-
-		fmt.Printf("Board: %+v \n", val)
 	}
 
 	// Image size.

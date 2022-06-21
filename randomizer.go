@@ -16,6 +16,7 @@ type Randomizer struct {
 }
 
 type PinsResult struct {
+	Id    string
 	Pins  []Pin
 	Error error
 }
@@ -48,8 +49,9 @@ func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
 	for _, boardId := range rnd.BoardIds {
 
 		go func(id string) {
-			pins, err := rnd.FetchSomePinsFromBoard(rnd.ClientBoards[id])
-			resultChan <- PinsResult{Pins: pins, Error: err}
+			board := rnd.ClientBoards[id]
+			pins, err := rnd.FetchSomePinsFromBoard(board)
+			resultChan <- PinsResult{Id: board.Name, Pins: pins, Error: err}
 		}(boardId)
 	}
 
@@ -58,6 +60,7 @@ func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
 	for i := 0; i < len(rnd.BoardIds); i++ {
 
 		r := <-resultChan
+		fmt.Printf("Received %d pins from %s \n", len(r.Pins), r.Id)
 
 		if r.Error != nil {
 			log.Fatal(r.Error)
@@ -70,12 +73,17 @@ func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
 }
 
 func (rnd *Randomizer) FetchSomePinsFromBoard(board *Board) ([]Pin, error) {
-	fmt.Println("Fetching all pins from Board: " + board.Name)
+
+	fmt.Printf("Request some pins from %s\n", board.Name)
+
 	allPins, err := rnd.Client.FetchAllPins(board)
+
 	if err != nil {
 		return nil, err
 	}
+
 	trimmedPins := rnd.Trim(allPins, rnd.PinsPerBoard)
+
 	return trimmedPins, nil
 }
 
