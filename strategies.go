@@ -67,14 +67,18 @@ func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, err
 
 		parseErr := tmplController.ParseUrlQueries(uri, clientBoards)
 		if parseErr != nil {
-			return TemplateModel{}, parseErr
+			tmplController.Model.Error = parseErr.Error()
 		}
 
 		// Randomize – if there are any url-specified boards.
 		if len(tmplController.Model.UrlQuery.Boards) > 0 {
 
 			randomizer := NewRandomizer(pinClient, clientBoards)
-			randomizedPins := randomizer.GetRandomizedPins(tmplController.Model.UrlQuery.Max, tmplController.Model.UrlQuery.Boards)
+			randomizedPins, randErr := randomizer.GetRandomizedPins(tmplController.Model.UrlQuery.Max, tmplController.Model.UrlQuery.Boards)
+
+			if randErr != nil {
+				tmplController.Model.Error = randErr.Error()
+			}
 
 			for _, randomizedPin := range randomizedPins {
 				tmplController.AddPin(&randomizedPin)

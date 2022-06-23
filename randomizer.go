@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -25,7 +24,7 @@ func NewRandomizer(client *PinterestClient, clientBoards map[string]*Board) *Ran
 	return &Randomizer{Client: client, ClientBoards: clientBoards}
 }
 
-func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) []Pin {
+func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) ([]Pin, error) {
 	rand.Seed(time.Now().UnixNano())
 	rnd.Max = max
 	rnd.ProccessBoards(boardIds)
@@ -42,7 +41,7 @@ func (rnd *Randomizer) ProccessBoards(boardIds []string) {
 	}
 }
 
-func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
+func (rnd *Randomizer) FetchPinsFromSelectedBoards() ([]Pin, error) {
 
 	resultChan := make(chan PinsResult)
 
@@ -63,13 +62,12 @@ func (rnd *Randomizer) FetchPinsFromSelectedBoards() []Pin {
 		fmt.Printf("Received %d pins from %s \n", len(r.Pins), r.Id)
 
 		if r.Error != nil {
-			log.Fatal(r.Error)
-			break
+			return nil, r.Error
 		}
 		allPins = append(allPins, r.Pins...)
 	}
 
-	return allPins
+	return allPins, nil
 }
 
 func (rnd *Randomizer) FetchSomePinsFromBoard(board *Board) ([]Pin, error) {
