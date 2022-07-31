@@ -56,7 +56,7 @@ func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, err
 		if err != nil {
 			tmplController.Model.Error = err.Error()
 		} else {
-			for _, board := range fetchedClientBoards.Items {
+			for _, board := range fetchedClientBoards {
 				clientBoards[board.Id] = &Board{Id: board.Id, Name: board.Name} // TODO: why do we need to copy it? (probably cause it's an iterator value)
 			}
 		}

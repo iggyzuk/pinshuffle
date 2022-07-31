@@ -42,7 +42,8 @@ type UserAccount struct {
 }
 
 type Boards struct {
-	Items []Board `json:"items"`
+	Items    []Board `json:"items"`
+	Bookmark string  `json:"bookmark"`
 }
 
 type Board struct {
@@ -222,21 +223,47 @@ func (client *PinterestClient) FetchUserAccount() (*UserAccount, error) {
 	return userAccount, nil
 }
 
-func (client *PinterestClient) FetchBoards() (*Boards, error) {
+func (client *PinterestClient) FetchBoards() ([]Board, error) {
 
-	bytes, err := client.ExecuteRequest("/boards?page_size=100")
+	var resultBoards []Board
 
+	boards, err := client.FetchBoard("")
 	if err != nil {
 		return nil, err
 	}
 
-	var boards = new(Boards)
-	unmarshalErr := json.Unmarshal(bytes, &boards)
+	resultBoards = append(resultBoards, boards.Items...)
+
+	for len(boards.Bookmark) > 0 {
+		boards, err = client.FetchBoard(boards.Bookmark)
+		if err != nil {
+			return nil, err
+		}
+		resultBoards = append(resultBoards, boards.Items...)
+	}
+
+	return resultBoards, nil
+}
+
+func (client *PinterestClient) FetchBoard(bookmark string) (*Boards, error) {
+
+	url := "/boards/?page_size=100"
+	if len(bookmark) > 0 {
+		url += "&bookmark=" + bookmark
+	}
+
+	bytes, err := client.ExecuteRequest(url)
+	if err != nil {
+		return nil, err
+	}
+
+	var board = new(Boards)
+	unmarshalErr := json.Unmarshal(bytes, &board)
 	if unmarshalErr != nil {
 		return nil, unmarshalErr
 	}
 
-	return boards, nil
+	return board, nil
 }
 
 func (client *PinterestClient) FetchAllPins(board *Board) ([]Pin, error) {
