@@ -288,10 +288,12 @@
                 <a class="text-nowrap" href="https://pinterest.com/{{ .User.Name }}" target="_blank"><b>{{ .User.Name }}</b></a>
               </div>
             </div>
-
-            <button id="log-out-button" class="btn btn-danger text-nowrap" type="button" > ◈ Logout</button>
           
             {{ end }}
+
+            <button id="log-out-button" class="btn btn-danger text-nowrap" type="button" >
+             ◈ {{ if gt (len .User.Name) 0 }}Logout{{ else }}Reset{{ end }}
+             </button>
           
           </div>
 
