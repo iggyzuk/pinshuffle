@@ -6,7 +6,7 @@ import (
 
 func indexHandler(c *fiber.Ctx) error {
 
-	model, err := strategyFunc(c.Context().URI(), c.Cookies("access_token"))
+	model, err := strategyFunc(c)
 
 	if err != nil {
 		return err

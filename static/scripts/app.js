@@ -5,7 +5,7 @@ window.addEventListener('load', (event) => {
 
 const selectedThemeKey = 'selected_theme';
 
-function main () {
+function main() {
 
   try {
     var themeJson = JSON.parse(getCookie(selectedThemeKey));
@@ -16,16 +16,20 @@ function main () {
 
   // Init packery.
   var elem = document.querySelector('.grid');
-  var pckry = new Packery( elem, {
+  var pckry = new Packery(elem, {
     itemSelector: '.grid-item',
     gutter: 0
   });
 
-  // Shuffle – On click: shuffle all elements.
-  const shuffleButton = document.getElementById('shuffle-button');
-  shuffleButton.addEventListener('click', event => {
-    pckry.shuffle();
-  });
+  try {
+    // Shuffle – On click: shuffle all elements.
+    const shuffleButton = document.getElementById('shuffle-button');
+    shuffleButton.addEventListener('click', event => {
+      pckry.shuffle();
+    });
+  } catch (e) {
+    console.log("Shuffle button doesn't exist, this is fine.")
+  }
 
   // Image Popup – Find and cache.
   const imagePopupElem = document.getElementById('img-popup');
@@ -66,7 +70,7 @@ function main () {
 
   // Logout – On click: logout.
   const logoutButton = document.getElementById('log-out-button');
-  if(logoutButton != null) {
+  if (logoutButton != null) {
     logoutButton.addEventListener('click', event => {
       eraseCookie("access_token");
       location.reload();
@@ -75,16 +79,49 @@ function main () {
 
   // Intro – show when user is not authenticated.
   const introModalElem = document.getElementById('intro-modal');
-  if(introModalElem != null) {
+  if (introModalElem != null) {
     const introModal = new bootstrap.Modal(introModalElem, {
       keyboard: false
     })
     introModal.show();
   }
+
+  var taskId = getCookie("task");
+  if (taskId.length > 0) {
+    var baseUrl = window.location.protocol + "//" + window.location.host;
+    var taskUrl = baseUrl + "/task/" + taskId
+    console.log(taskUrl)
+
+    // Start polling the server for task data
+    let checkTaskStatus = function () {
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", taskUrl, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          console.log(xhr.responseText);
+
+          if (xhr.responseText == "complete") {
+            clearInterval(taskInterval);
+            location.reload();
+          } else if (xhr.responseText == "processing") {
+            // ...
+          } if (xhr.responseText == "error") {
+            clearInterval(taskInterval);
+            eraseCookie("task");
+            window.location.replace(baseUrl);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    let taskInterval = setInterval(checkTaskStatus, 2500);
+  }
 }
 
 function saveTheme(name, link) {
-  setCookie(selectedThemeKey, JSON.stringify({name: name, link: link}), 365)
+  setCookie(selectedThemeKey, JSON.stringify({ name: name, link: link }), 365)
 }
 
 function applyTheme(name, link) {

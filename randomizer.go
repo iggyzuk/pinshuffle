@@ -8,7 +8,7 @@ import (
 
 type Randomizer struct {
 	Client       *PinterestClient
-	ClientBoards map[string]*Board
+	ClientBoards map[string]Board
 	BoardIds     []string
 	Max          int
 	PinsPerBoard int
@@ -20,10 +20,11 @@ type PinsResult struct {
 	Error error
 }
 
-func NewRandomizer(client *PinterestClient, clientBoards map[string]*Board) *Randomizer {
+func NewRandomizer(client *PinterestClient, clientBoards map[string]Board) *Randomizer {
 	return &Randomizer{Client: client, ClientBoards: clientBoards}
 }
 
+// Randomizer fetches pins from selected boards and trims them with the max value specified.
 func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) ([]Pin, error) {
 	rand.Seed(time.Now().UnixNano())
 	rnd.Max = max
@@ -70,7 +71,7 @@ func (rnd *Randomizer) FetchPinsFromSelectedBoards() ([]Pin, error) {
 	return allPins, nil
 }
 
-func (rnd *Randomizer) FetchSomePinsFromBoard(board *Board) ([]Pin, error) {
+func (rnd *Randomizer) FetchSomePinsFromBoard(board Board) ([]Pin, error) {
 
 	fmt.Printf("Request some pins from %s\n", board.Name)
 

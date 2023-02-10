@@ -25,6 +25,7 @@ type TemplateModel struct {
 	Message       string
 	UrlQuery      TemplateUrlQuery
 	ImageSize     int
+	Loading       bool
 }
 
 type TemplateUser struct {
@@ -51,6 +52,27 @@ type TemplateUrlQuery struct {
 	Boards          []string
 	Max             int
 	ImageResolution int
+}
+
+func (query TemplateUrlQuery) GetImageResolution(images Images) Image {
+	imgRes := query.ImageResolution
+
+	if imgRes == 0 {
+		return images.Small
+	}
+	if imgRes == 1 {
+		return images.Medium
+	}
+	if imgRes == 2 {
+		return images.Huge
+	}
+	if imgRes == 3 {
+		return images.Huge
+	}
+	if imgRes == 4 {
+		return images.Original
+	}
+	return images.Medium
 }
 
 func NewTemplateController(authUrl string) *TemplateController {
@@ -88,33 +110,12 @@ func (tc *TemplateController) GetBoardsSorted() []*TemplateBoard {
 	return boardList
 }
 
-func (tc *TemplateController) GetImageResolution(images Images) Image {
-	imgRes := tc.Model.UrlQuery.ImageResolution
-
-	if imgRes == 0 {
-		return images.Small
-	}
-	if imgRes == 1 {
-		return images.Medium
-	}
-	if imgRes == 2 {
-		return images.Huge
-	}
-	if imgRes == 3 {
-		return images.Huge
-	}
-	if imgRes == 4 {
-		return images.Original
-	}
-	return images.Medium
-}
-
 func (tc *TemplateController) AddPin(pin *Pin) {
 	tc.Model.Pins = append(tc.Model.Pins, TemplatePin{
 		Id:       pin.Id,
 		Name:     pin.Title,
 		Color:    pin.DominantColor,
-		ImageURL: tc.GetImageResolution(pin.Media.Images).Url,
+		ImageURL: tc.Model.UrlQuery.GetImageResolution(pin.Media.Images).Url,
 		AltText:  pin.AltText,
 		Board:    tc.Model.Boards[pin.BoardId],
 	})
@@ -127,7 +128,7 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 
 	tc.Model.User = TemplateUser{Name: "Iggy Zuk", IconURL: "https://iggyzuk.com/img/profile/iggy.jpg", URL: "#"}
 
-	var clientBoards = make(map[string]*Board)
+	var clientBoards = make(map[string]Board)
 
 	tc.MockBoard(clientBoards, "visits")
 	tc.MockBoard(clientBoards, "insightful edge")
@@ -178,13 +179,14 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 	tc.Model.Error = "This is an example error!"
 }
 
-func (tc *TemplateController) MockBoard(boards map[string]*Board, id string) *Board {
-	board := &Board{Id: id, Name: id}
+func (tc *TemplateController) MockBoard(boards map[string]Board, id string) Board {
+	board := Board{Id: id, Name: id}
 	boards[id] = board
 	return board
 }
 
-func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[string]*Board) error {
+// Parses the URI for max pins, boards, image-size.
+func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards map[string]Board) error {
 	queryString := string(uri.QueryString())
 
 	queryMap, err := url.ParseQuery(queryString)

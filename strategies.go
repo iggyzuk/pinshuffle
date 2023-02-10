@@ -1,27 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
-	"github.com/valyala/fasthttp"
+	"github.com/gofiber/fiber/v2"
 )
 
-type StrategyFunc func(uri *fasthttp.URI, accessToken string) (TemplateModel, error)
+type StrategyFunc func(c *fiber.Ctx) (TemplateModel, error)
 
-func GetMockTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, error) {
+func GetMockTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 	var tmplController = NewTemplateController("")
 
-	tmplController.Mock(uri)
+	tmplController.Mock(c.Context().URI())
 
 	return tmplController.Model, nil
 }
 
-func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, error) {
+func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 	var pinClient = NewClient()
 
 	var tmplController = NewTemplateController(pinClient.GetAuthUri())
+
+	var accessToken = c.Cookies("access_token")
 
 	if len(accessToken) == 0 {
 
@@ -49,7 +53,7 @@ func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, err
 			}
 		}
 
-		var clientBoards = make(map[string]*Board)
+		var clientBoards = make(map[string]Board)
 
 		var fetchedClientBoards, err = pinClient.FetchBoards()
 
@@ -57,7 +61,8 @@ func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, err
 			tmplController.Model.Error = err.Error()
 		} else {
 			for _, board := range fetchedClientBoards {
-				clientBoards[board.Id] = &Board{Id: board.Id, Name: board.Name} // TODO: why do we need to copy it? (probably cause it's an iterator value)
+				// make a deep copy from a pointer
+				clientBoards[board.Id] = Board{Id: board.Id, Name: board.Name}
 			}
 		}
 
@@ -65,26 +70,74 @@ func GetTemplateModel(uri *fasthttp.URI, accessToken string) (TemplateModel, err
 			tmplController.Model.Message = "💭 No boards found"
 		}
 
-		parseErr := tmplController.ParseUrlQueries(uri, clientBoards)
+		parseErr := tmplController.ParseUrlQueries(c.Context().URI(), clientBoards)
 		if parseErr != nil {
 			tmplController.Model.Error = parseErr.Error()
 		}
 
-		// Randomize – if there are any url-specified boards.
-		if len(tmplController.Model.UrlQuery.Boards) > 0 {
+		// Find task id in cookies.
+		taskId := c.Cookies("task")
 
-			randomizer := NewRandomizer(pinClient, clientBoards)
-			randomizedPins, randErr := randomizer.GetRandomizedPins(tmplController.Model.UrlQuery.Max, tmplController.Model.UrlQuery.Boards)
+		if len(taskId) > 0 {
 
-			if randErr != nil {
-				tmplController.Model.Error = randErr.Error()
+			task, exists := tasks[taskId]
+
+			// Copy all pins when the task completes
+			if exists && task.IsComplete {
+
+				for _, randomizedPin := range task.Pins {
+					tmplController.AddPin(&randomizedPin)
+				}
+
+				// delete it and clear the cookie
+				delete(tasks, taskId)
+				c.ClearCookie("task")
+			} else {
+
+				// Let the client know that task is there and is still processing...
+				tmplController.Model.Message = fmt.Sprintf("Still Processing Task with Id: %s", taskId)
+				tmplController.Model.Loading = true
 			}
 
-			for _, randomizedPin := range randomizedPins {
-				tmplController.AddPin(&randomizedPin)
+			// Check and delete any abandoned tasks
+			abandonedTaskIds := []string{}
+			now := time.Now()
+
+			for _, taskToCheck := range tasks {
+				elapsed := now.Sub(taskToCheck.Timestamp)
+				fmt.Printf("Checking Task; Elapsed: %s\n", elapsed)
+				if elapsed >= 5*time.Minute {
+					abandonedTaskIds = append(abandonedTaskIds, taskToCheck.Id)
+				}
 			}
+
+			for _, abandonedTaskId := range abandonedTaskIds {
+				delete(tasks, abandonedTaskId)
+				fmt.Printf("Deleted Abandoned Task: %s\n", abandonedTaskId)
+			}
+
+			return tmplController.Model, nil
+
+		} else if len(tmplController.Model.UrlQuery.Boards) > 0 {
+
+			// Create a new task and let the client know of its id
+			task := NewTask()
+
+			cookie := fiber.Cookie{
+				Name:    "task",
+				Value:   task.Id,
+				Expires: time.Now().Add(5 * time.Minute),
+			}
+
+			c.Cookie(&cookie)
+
+			// Start the task in the background and send the response back to the client.
+			go task.Process(pinClient, clientBoards, tmplController.Model.UrlQuery)
+			tmplController.Model.Loading = true
+			return tmplController.Model, nil
 		}
 	}
 
+	// No task currently processing, no boards selected
 	return tmplController.Model, nil
 }

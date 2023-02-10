@@ -12,7 +12,12 @@ import (
 
 var strategyFunc StrategyFunc
 
+// String (Id) -> *Task
+var tasks map[string]*Task
+
 func main() {
+
+	tasks = make(map[string]*Task)
 
 	// Use real or mock index strategy when you find "-mock" argument
 	strategyFunc = GetTemplateModel
@@ -46,6 +51,7 @@ func main() {
 
 	app.Get("/", indexHandler)
 	app.Get("/redirect", authRedirectHandler)
+	app.Get("/task/*", taskHandler)
 	app.Get("/privacy", privacyHandler)
 
 	// 404 handler.

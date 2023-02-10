@@ -266,7 +266,7 @@ func (client *PinterestClient) FetchBoard(bookmark string) (*Boards, error) {
 	return board, nil
 }
 
-func (client *PinterestClient) FetchAllPins(board *Board) ([]Pin, error) {
+func (client *PinterestClient) FetchAllPins(board Board) ([]Pin, error) {
 
 	var resultingPins []Pin
 
@@ -288,7 +288,7 @@ func (client *PinterestClient) FetchAllPins(board *Board) ([]Pin, error) {
 	return resultingPins, nil
 }
 
-func (client *PinterestClient) FetchPage(board *Board, bookmark string) (*Pins, error) {
+func (client *PinterestClient) FetchPage(board Board, bookmark string) (*Pins, error) {
 
 	url := "/boards/" + board.Id + "/pins?page_size=100"
 	if len(bookmark) > 0 {
