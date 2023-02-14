@@ -67,6 +67,6 @@ func main() {
 		port = "3000"
 	}
 
-	// Start server on http://${heroku-url}:${port}
+	// Start server on http://${fly-url}:${port}
 	app.Listen(":" + port)
 }

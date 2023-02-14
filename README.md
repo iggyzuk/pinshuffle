@@ -1,10 +1,10 @@
-# [Pin Shuffle](http://pinshuffle.herokuapp.com) - Pinterest Board Randomizer
+# [Pin Shuffle](https://pinshuffle.fly.dev) - Pinterest Board Randomizer
 
 *Are you an avid **Pinterest** user?*
 
 *Don't you wish there was a way to shuffle all those pins?*
 
-**[Pin Shuffle](http://pinshuffle.herokuapp.com)** to the rescue!
+**[Pin Shuffle](https://pinshuffle.fly.dev)** to the rescue!
 
 ![](docs/big-shuffle.jpg)
 
