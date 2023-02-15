@@ -9,6 +9,7 @@ processes = []
 
 [build.args]
   BP_KEEP_FILES = "templates:/templates,static:/static"
+  BP_COPY_DESTINATION = "/app"
 
 [env]
   PORT = "8080"
