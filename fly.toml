@@ -4,7 +4,11 @@ kill_timeout = 5
 processes = []
 
 [build]
-  builtin = "go"
+  builder = "paketobuildpacks/builder:base"
+  buildpacks = ["gcr.io/paketo-buildpacks/go"]
+
+[build.args]
+  BP_KEEP_FILES = "templates:/templates,static:/static"
 
 [env]
   PORT = "8080"
