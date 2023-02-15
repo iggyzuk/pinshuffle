@@ -44,7 +44,7 @@ func main() {
 	})
 
 	app.Use(func(c *fiber.Ctx) error {
-		c.Set("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval';")
+		c.Set("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval'; frame-src * 'unsafe-inline' 'unsafe-eval';")
 		return c.Next()
 	})
 
