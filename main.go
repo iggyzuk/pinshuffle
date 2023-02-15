@@ -64,7 +64,7 @@ func main() {
 
 	// Use a default port if none was set in env.
 	if port == "" {
-		port = "3000"
+		port = "8080"
 	}
 
 	// Start server on http://${fly-url}:${port}
