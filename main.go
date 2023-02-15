@@ -48,7 +48,7 @@ func main() {
 
 	// Add a middleware that adds the Content-Security-Policy header to the response
 	app.Use(func(c *fiber.Ctx) error {
-		c.Set("Content-Security-Policy", "default-src 'self'; script-src 'self' api.pinterest.com; frame-src 'self' ct.pinterest.com;")
+		c.Set("Content-Security-Policy", "*")
 		return c.Next()
 	})
 
