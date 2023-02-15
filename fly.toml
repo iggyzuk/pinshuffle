@@ -3,14 +3,6 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
-[build]
-  builder = "paketobuildpacks/builder:base"
-  buildpacks = ["gcr.io/paketo-buildpacks/go"]
-
-[build.args]
-  BP_KEEP_FILES = "templates/**:/templates,static/**:/static"
-  BP_COPY_DESTINATION = "/app"
-
 [env]
   PORT = "8080"
 
