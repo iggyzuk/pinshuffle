@@ -43,14 +43,13 @@ func main() {
 		Views: engine,
 	})
 
-	app.Use(logger.New())
-	app.Use("/monitor", monitor.New())
-
-	// Add a middleware that adds the Content-Security-Policy header to the response
 	app.Use(func(c *fiber.Ctx) error {
-		c.Set("Content-Security-Policy", "default-src 'self' https://*.pinterest.com https://*.fly.dev; script-src 'self' https://*.pinterest.com https://*.fly.dev 'unsafe-inline' 'unsafe-eval'; img-src * data:;")
+		c.Set("Content-Security-Policy", "default-src *; frame-src *")
 		return c.Next()
 	})
+
+	app.Use(logger.New())
+	app.Use("/monitor", monitor.New())
 
 	// Load static files like CSS, Images & JavaScript.
 	app.Static("/static", "./static")
