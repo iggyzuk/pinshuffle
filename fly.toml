@@ -43,5 +43,4 @@ processes = []
     timeout = "2s"
 
 [headers]
-  Access-Control-Allow-Origin = "*"
-  Content-Security-Policy = "default-src 'self' *"
+  Content-Security-Policy = "default-src 'self'; frame-src *;"
