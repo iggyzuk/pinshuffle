@@ -46,12 +46,6 @@ func main() {
 	app.Use(logger.New())
 	app.Use("/monitor", monitor.New())
 
-	// Add a middleware that adds the Content-Security-Policy header to the response
-	app.Use(func(c *fiber.Ctx) error {
-		c.Set("Content-Security-Policy", "*")
-		return c.Next()
-	})
-
 	// Load static files like CSS, Images & JavaScript.
 	app.Static("/static", "./static")
 

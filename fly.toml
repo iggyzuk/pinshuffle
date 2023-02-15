@@ -41,3 +41,7 @@ processes = []
     interval = "15s"
     restart_limit = 0
     timeout = "2s"
+
+[headers]
+  Access-Control-Allow-Origin = "*"
+  Content-Security-Policy = "default-src 'self' *"
