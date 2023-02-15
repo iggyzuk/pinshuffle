@@ -8,7 +8,7 @@ processes = []
   buildpacks = ["gcr.io/paketo-buildpacks/go"]
 
 [build.args]
-  BP_KEEP_FILES = "templates:/templates,static:/static"
+  BP_KEEP_FILES = "templates/**:/templates,static/**:/static"
   BP_COPY_DESTINATION = "/app"
 
 [env]
