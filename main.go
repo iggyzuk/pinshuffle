@@ -45,7 +45,7 @@ func main() {
 
 	app.Use(func(c *fiber.Ctx) error {
 		// default-src * data: blob: filesystem: about: ws: wss: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src * data: blob: 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src * data: blob: ; style-src * data: blob: 'unsafe-inline'; font-src * data: blob: 'unsafe-inline'; frame-ancestors * data: blob:;
-		c.Set("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; child-src *; style-src * 'unsafe-inline'; font-src: * 'unsafe-inline'; manifest-src: *; navigate-to: *;")
+		c.Set("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; child-src *; style-src * 'unsafe-inline'; font-src * 'unsafe-inline'; manifest-src *; navigate-to *;")
 		return c.Next()
 	})
 
