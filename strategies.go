@@ -21,9 +21,7 @@ func GetMockTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
-	var pinClient = NewClient()
-
-	var tmplController = NewTemplateController(pinClient.GetAuthUri())
+	var tmplController = NewTemplateController(app.PinClient.GetAuthUri())
 
 	var accessToken = c.Cookies("access_token")
 
@@ -39,10 +37,10 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 		// Real: fetch boards, process url, randomize.
 
 		log.Println("Cookie Exists")
-		pinClient.AccessToken = accessToken
+		app.PinClient.AccessToken = accessToken
 		tmplController.Model.Authenticated = true
 
-		user, userErr := pinClient.FetchUserAccount()
+		user, userErr := app.PinClient.FetchUserAccount()
 		if userErr != nil {
 			tmplController.Model.Error = userErr.Error()
 		} else {
@@ -55,7 +53,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 		var clientBoards = make(map[string]Board)
 
-		var fetchedClientBoards, err = pinClient.FetchBoards()
+		var fetchedClientBoards, err = app.PinClient.FetchBoards()
 
 		if err != nil {
 			tmplController.Model.Error = err.Error()
@@ -80,7 +78,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 		if len(taskId) > 0 {
 
-			task, exists := tasks[taskId]
+			task, exists := app.Tasks[taskId]
 
 			// Copy all pins when the task completes
 			if exists && task.IsComplete {
@@ -90,7 +88,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 				}
 
 				// delete it and clear the cookie
-				delete(tasks, taskId)
+				delete(app.Tasks, taskId)
 				c.ClearCookie("task")
 			} else {
 
@@ -103,7 +101,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 			abandonedTaskIds := []string{}
 			now := time.Now()
 
-			for _, taskToCheck := range tasks {
+			for _, taskToCheck := range app.Tasks {
 				elapsed := now.Sub(taskToCheck.Timestamp)
 				fmt.Printf("Checking Task; Elapsed: %s\n", elapsed)
 				if elapsed >= 5*time.Minute {
@@ -112,7 +110,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 			}
 
 			for _, abandonedTaskId := range abandonedTaskIds {
-				delete(tasks, abandonedTaskId)
+				delete(app.Tasks, abandonedTaskId)
 				fmt.Printf("Deleted Abandoned Task: %s\n", abandonedTaskId)
 			}
 
@@ -132,7 +130,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 			c.Cookie(&cookie)
 
 			// Start the task in the background and send the response back to the client.
-			go task.Process(pinClient, clientBoards, tmplController.Model.UrlQuery)
+			go task.Process(app.PinClient, clientBoards, tmplController.Model.UrlQuery)
 			tmplController.Model.Loading = true
 			return tmplController.Model, nil
 		}

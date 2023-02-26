@@ -6,7 +6,7 @@ import (
 
 func indexHandler(c *fiber.Ctx) error {
 
-	model, err := strategyFunc(c)
+	model, err := app.Func(c)
 
 	if err != nil {
 		return err

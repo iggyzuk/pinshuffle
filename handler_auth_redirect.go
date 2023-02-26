@@ -9,8 +9,6 @@ import (
 
 func authRedirectHandler(c *fiber.Ctx) error {
 
-	var client = NewClient()
-
 	// Once the user approves authorization for your app, they will be sent to your redirect URI as indicated in the request.
 	// 		We will add the following parameters as we make the call to your redirect URI:
 	//			code: This is the code you will use in the next step to exchange for an access token.
@@ -23,7 +21,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 	if len(codeKey) > 0 {
 		log.Println("Code Key: " + codeKey)
 
-		err := client.FetchAccessToken(codeKey)
+		err := app.PinClient.FetchAccessToken(codeKey)
 
 		if err != nil {
 			return err
@@ -31,7 +29,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 
 		cookie := fiber.Cookie{
 			Name:    "access_token",
-			Value:   client.AccessToken,
+			Value:   app.PinClient.AccessToken,
 			Expires: time.Now().Add(365 * 24 * time.Hour),
 		}
 
@@ -41,7 +39,7 @@ func authRedirectHandler(c *fiber.Ctx) error {
 
 		log.Println("Success! Go back home!")
 
-		c.Redirect(client.MainURL)
+		c.Redirect(app.PinClient.MainURL)
 	}
 
 	return nil

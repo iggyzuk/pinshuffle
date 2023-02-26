@@ -10,7 +10,7 @@ func taskHandler(c *fiber.Ctx) error {
 	taskId := c.Params("*")
 	taskId = strings.TrimSpace(taskId)
 
-	task, exists := tasks[taskId]
+	task, exists := app.Tasks[taskId]
 
 	if exists {
 		if task.IsComplete {

@@ -24,7 +24,7 @@ func NewTask() *Task {
 		Pins:       nil,
 	}
 
-	tasks[task.Id] = task
+	app.Tasks[task.Id] = task
 
 	fmt.Println("New Task: " + task.Id)
 
