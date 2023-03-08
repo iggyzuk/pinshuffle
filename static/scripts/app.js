@@ -4,19 +4,42 @@ window.addEventListener('load', (event) => {
 });
 
 const selectedThemeKey = 'selected_theme';
+const settingsKey = 'settings';
+
+let settings = {
+  wide: true,
+  tall: true,
+  borders: true,
+  hoverInfo: true,
+  grayscale: false,
+  contrast: false,
+  invert: false,
+  saturate: false,
+};
 
 function main() {
 
+  var r = document.querySelector(':root');
+
   try {
-    var themeJson = JSON.parse(getCookie(selectedThemeKey));
-    applyTheme(themeJson.name, themeJson.link);
+    var themeObj = JSON.parse(getCookie(selectedThemeKey));
+    applyTheme(themeObj.name, themeObj.link);
   } catch (e) {
     console.log("Could not parse selected-theme JSON from cookie.")
   }
 
+  try {
+    var settingsObj = JSON.parse(getCookie(settingsKey));
+    settings = settingsObj;
+    applySettings(r, settings);
+    console.log(settings);
+  } catch (e) {
+    console.log("Could not parse settings JSON from cookie.")
+  }
+
   // Init packery.
   var elem = document.querySelector('.grid');
-  var pckry = new Packery(elem, {
+  var packery = new Packery(elem, {
     itemSelector: '.grid-item',
     gutter: 0
   });
@@ -25,7 +48,7 @@ function main() {
     // Shuffle – On click: shuffle all elements.
     const shuffleButton = document.getElementById('shuffle-button');
     shuffleButton.addEventListener('click', event => {
-      pckry.shuffle();
+      packery.shuffle();
     });
   } catch (e) {
     console.log("Shuffle button doesn't exist, this is fine.")
@@ -67,6 +90,81 @@ function main() {
       applyTheme(themeButton.innerHTML, theme);
     });
   }
+
+  // User Settings.
+  const wide = document.getElementById('settings-wide');
+  wide.checked = settings.wide;
+  wide.addEventListener('change', event => {
+    settings.wide = wide.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+    packery.layout();
+  });
+
+  const tall = document.getElementById('settings-tall');
+  tall.checked = settings.tall;
+  tall.addEventListener('change', event => {
+    settings.tall = tall.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+    packery.layout();
+  });
+
+  const borders = document.getElementById('settings-borders');
+  borders.checked = settings.borders;
+  borders.addEventListener('change', event => {
+    settings.borders = borders.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
+
+  const hoverInfo = document.getElementById('settings-hover-info');
+  hoverInfo.checked = settings.hoverInfo;
+  hoverInfo.addEventListener('change', event => {
+    settings.hoverInfo = hoverInfo.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
+
+  const grayscale = document.getElementById('settings-grayscale');
+  grayscale.checked = settings.grayscale;
+  grayscale.addEventListener('change', event => {
+    settings.grayscale = grayscale.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
+
+  const contrast = document.getElementById('settings-contrast');
+  contrast.checked = settings.contrast;
+  contrast.addEventListener('change', event => {
+    settings.contrast = contrast.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
+
+  const invert = document.getElementById('settings-invert');
+  invert.checked = settings.invert;
+  invert.addEventListener('change', event => {
+    settings.invert = invert.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
+
+  const saturate = document.getElementById('settings-saturate');
+  saturate.checked = settings.saturate;
+  saturate.addEventListener('change', event => {
+    settings.saturate = saturate.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+  });
 
   // Logout – On click: logout.
   const logoutButton = document.getElementById('log-out-button');
@@ -131,4 +229,25 @@ function applyTheme(name, link) {
     const themeDropdown = document.getElementById('theme-dropdown');
     themeDropdown.innerHTML = name;
   }
+}
+
+function saveSettings(settings) {
+  setCookie(settingsKey, JSON.stringify(settings), 365);
+}
+
+function applySettings(r, settings) {
+  r.style.setProperty('--img-width', settings.wide ? '150px' : '75px');
+  r.style.setProperty('--img-height', settings.tall ? '150px' : '75px');
+  r.style.setProperty('--border', settings.borders ? '2px' : '0px');
+  r.style.setProperty('--border-radius-out', settings.borders ? '6px' : '0px');
+  r.style.setProperty('--border-radius-in', settings.borders ? '4px' : '0px');
+  r.style.setProperty('--hover-info-img', settings.hoverInfo ? 0.5 : 0.9);
+  r.style.setProperty('--hover-info-pin', settings.hoverInfo ? 1 : 0);
+
+  let filter = '';
+  if (settings.grayscale) filter += 'grayscale(100%) ';
+  if (settings.contrast) filter += 'contrast(1000%) brightness(1000%) ';
+  if (settings.invert) filter += 'invert(100%) ';
+  if (settings.saturate) filter += 'saturate(1000%) ';
+  r.style.setProperty('--filter', filter.length > 0 ? filter : 'none');
 }
