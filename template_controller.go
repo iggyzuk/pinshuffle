@@ -58,21 +58,18 @@ func (query TemplateUrlQuery) GetImageResolution(images Images) Image {
 	imgRes := query.ImageResolution
 
 	if imgRes == 0 {
-		return images.Small
+		return images.Res150x150
 	}
 	if imgRes == 1 {
-		return images.Medium
+		return images.Res400x300
 	}
 	if imgRes == 2 {
-		return images.Huge
+		return images.Res600x
 	}
 	if imgRes == 3 {
-		return images.Huge
+		return images.Res1200x
 	}
-	if imgRes == 4 {
-		return images.Original
-	}
-	return images.Medium
+	return images.Res400x300
 }
 
 func NewTemplateController(authUrl string) *TemplateController {
