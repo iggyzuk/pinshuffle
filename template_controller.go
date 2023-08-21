@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"sort"
 	"strconv"
@@ -108,11 +109,24 @@ func (tc *TemplateController) GetBoardsSorted() []*TemplateBoard {
 }
 
 func (tc *TemplateController) AddPin(pin *Pin) {
+
+	var imageUrl = tc.Model.UrlQuery.GetImageResolution(pin.Media.Images).Url
+
+	// Image res of 4 implies a search for original images in needed.
+	if tc.Model.UrlQuery.ImageResolution == 4 {
+		imageUrlInFormat, err := TryDifferentImageFormats(pin.Media.Images.Res150x150.Url)
+		if err != nil {
+			log.Println(err)
+		} else {
+			imageUrl = imageUrlInFormat
+		}
+	}
+
 	tc.Model.Pins = append(tc.Model.Pins, TemplatePin{
 		Id:       pin.Id,
 		Name:     pin.Title,
 		Color:    pin.DominantColor,
-		ImageURL: tc.Model.UrlQuery.GetImageResolution(pin.Media.Images).Url,
+		ImageURL: imageUrl,
 		AltText:  pin.AltText,
 		Board:    tc.Model.Boards[pin.BoardId],
 	})
