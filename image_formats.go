@@ -27,6 +27,7 @@ func TryDifferentImageFormats(url string) (string, error) {
 		urlOriginal,
 		strings.Replace(urlOriginal, ".jpg", ".png", 1),
 		strings.Replace(urlOriginal, ".jpg", ".gif", 1),
+		strings.Replace(urlOriginal, ".jpg", ".webp", 1),
 	}
 
 	resultChan := make(chan (ImageFormatResult))
@@ -47,13 +48,14 @@ func TryDifferentImageFormats(url string) (string, error) {
 
 func checkUrl(url string, ch chan ImageFormatResult) {
 	resp, err := http.Get(url)
+
+	result := ImageFormatResult{url, false}
+
 	if err != nil {
-		close(ch)
+		ch <- result
 		return
 	}
 	defer resp.Body.Close()
-
-	result := ImageFormatResult{url, false}
 
 	if resp.StatusCode == http.StatusOK {
 		result.Success = true
