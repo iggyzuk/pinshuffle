@@ -7,6 +7,7 @@ const selectedThemeKey = 'selected_theme';
 const settingsKey = 'settings';
 
 let settings = {
+  large: false,
   wide: true,
   tall: true,
   borders: true,
@@ -43,6 +44,31 @@ function main() {
     itemSelector: '.grid-item',
     gutter: 0
   });
+
+  // Force layout after images load
+  const images = elem.querySelectorAll('img');
+  let loadedImages = 0;
+  const totalImages = images.length;
+
+  if (totalImages === 0) {
+    packery.layout();
+  } else {
+    images.forEach(img => {
+      if (img.complete) {
+        loadedImages++;
+        if (loadedImages === totalImages) {
+          packery.layout();
+        }
+      } else {
+        img.addEventListener('load', () => {
+          loadedImages++;
+          if (loadedImages === totalImages) {
+            packery.layout();
+          }
+        });
+      }
+    });
+  }
 
   try {
     // Shuffle – On click: shuffle all elements.
@@ -106,6 +132,16 @@ function main() {
   tall.checked = settings.tall;
   tall.addEventListener('change', event => {
     settings.tall = tall.checked;
+    saveSettings(settings);
+
+    applySettings(r, settings);
+    packery.layout();
+  });
+
+  const large = document.getElementById('settings-large');
+  large.checked = settings.large;
+  large.addEventListener('change', event => {
+    settings.large = large.checked;
     saveSettings(settings);
 
     applySettings(r, settings);
@@ -236,8 +272,14 @@ function saveSettings(settings) {
 }
 
 function applySettings(r, settings) {
-  r.style.setProperty('--img-width', settings.wide ? '150px' : '75px');
-  r.style.setProperty('--img-height', settings.tall ? '150px' : '75px');
+  if (settings.large) {
+    r.style.setProperty('--img-width', '750px');
+    r.style.setProperty('--img-height', 'auto');
+  } else {
+    r.style.setProperty('--img-width', settings.wide ? '150px' : '75px');
+    r.style.setProperty('--img-height', settings.tall ? '150px' : '75px');
+  }
+
   r.style.setProperty('--border', settings.borders ? '2px' : '0px');
   r.style.setProperty('--border-radius-out', settings.borders ? '6px' : '0px');
   r.style.setProperty('--border-radius-in', settings.borders ? '4px' : '0px');
