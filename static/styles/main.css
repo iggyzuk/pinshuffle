@@ -1,6 +1,6 @@
 :root {
-  --img-width: 150px;
-  --img-height: 150px;
+  --columns: 8;
+  --cell-aspect: 1;
   --border: 2px;
   --border-radius-out: 6px;
   --border-radius-in: 4px;
@@ -15,13 +15,38 @@ body {
   margin: 0;
   padding: 0;
   overflow-y: auto;
+  /* Always keep the scrollbar, otherwise it can come and go as the items resize. */
+  min-height: calc(100vh + 1px);
+}
+
+/* The transparent borders are the gaps between images, but on the outside they
+   would keep the images from reaching the edges of the page. So the grid sticks
+   out by one border, and that part gets cut off. */
+.grid-bleed {
+  overflow-x: clip;
+}
+
+.grid {
+  position: relative;
+  margin-inline: calc(-1 * var(--border));
+}
+
+/* Packery takes its column width from the sizer. */
+.grid-sizer,
+.grid-item {
+  width: calc(100% / var(--columns));
+}
+
+.grid-sizer {
+  position: absolute;
 }
 
 .grid-item {
   position: relative;
   float: left;
-  width: var(--img-width);
-  height: var(--img-height);
+  /* Large mode has no fixed cell shape, it uses the shape of the pin if known. */
+  aspect-ratio: var(--cell-aspect, var(--pin-aspect, auto));
+  min-height: 0;
   border: var(--border) solid #00000000;
   border-radius: var(--border-radius-out);
   filter: var(--filter);
@@ -33,6 +58,7 @@ body {
 }
 
 .grid-item .grid-image {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -53,20 +79,6 @@ body {
   z-index: 1; 
   opacity: 0;
   pointer-events: none;
-}
-
-.pin img {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-}
-
-.grid-item--large .grid-image {
-  object-fit: scale-down;
-}
-
-.grid-item--large .pin {
-  display: block;
 }
 
 #img-popup-src {

@@ -1,10 +1,8 @@
 package main
 
 import (
+	"slices"
 	"sort"
-
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 func IsBoardSelected(boards []string, id string) bool {
@@ -12,20 +10,14 @@ func IsBoardSelected(boards []string, id string) bool {
 }
 
 func SortBoards(boards map[string]*TemplateBoard) []*TemplateBoard {
-	list := maps.Values(boards)
+	list := make([]*TemplateBoard, 0, len(boards))
+	for _, board := range boards {
+		list = append(list, board)
+	}
 
 	sort.SliceStable(list, func(i, j int) bool {
 		return list[i].Name < list[j].Name
 	})
 
 	return list
-}
-
-func Iterate(count int) []int {
-	var i int
-	var Items []int
-	for i = 0; i < (count); i++ {
-		Items = append(Items, i)
-	}
-	return Items
 }

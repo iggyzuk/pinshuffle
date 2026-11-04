@@ -1,46 +1,54 @@
 package main
 
 import (
+	"context"
 	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
+const authFailedURL = "/?auth=failed"
+
+// loginHandler sends the user to Pinterest. The state ties the callback to this
+// browser, so nobody can trick a user into logging in as someone else.
+func loginHandler(c *fiber.Ctx) error {
+	state := uuid.NewString()
+	c.Cookie(sessionCookie(oauthStateCookie, state, time.Now().Add(10*time.Minute)))
+	return c.Redirect(app.PinClient.GetAuthUri(state))
+}
+
+func logoutHandler(c *fiber.Ctx) error {
+	clearTokens(c)
+	clearCookie(c, taskCookie)
+	return c.Redirect("/", fiber.StatusSeeOther)
+}
+
+// authRedirectHandler is where Pinterest returns the user, with ?code=&state= on
+// success or ?error= if they declined.
 func authRedirectHandler(c *fiber.Ctx) error {
+	code := c.Query("code")
+	state := c.Query("state")
+	expectedState := c.Cookies(oauthStateCookie)
 
-	// Once the user approves authorization for your app, they will be sent to your redirect URI as indicated in the request.
-	// 		We will add the following parameters as we make the call to your redirect URI:
-	//			code: This is the code you will use in the next step to exchange for an access token.
-	//			state: This is the optional parameter to prevent cross-site request forgery. Check to make sure it matches what was passed in the first step of the flow. If it does not, the exchange may have been subject to a cross-site request forgery attack.
-	// A redirect URI such as https://www.example.com/oauth/pinterest/oauth_response/
-	// 		will result in a callback request like: https://www.example.com/oauth/pinterest/oauth_response/?code={CODE}&state={YOUR_OPTIONAL_STRING}
+	clearCookie(c, oauthStateCookie)
 
-	codeKey := c.Query("code")
-
-	if len(codeKey) > 0 {
-		log.Println("Code Key: " + codeKey)
-
-		err := app.PinClient.FetchAccessToken(codeKey)
-
-		if err != nil {
-			return err
-		}
-
-		cookie := fiber.Cookie{
-			Name:    "access_token",
-			Value:   app.PinClient.AccessToken,
-			Expires: time.Now().Add(365 * 24 * time.Hour),
-		}
-
-		c.Cookie(&cookie)
-
-		log.Printf("Cookie: %s, value: %s", cookie.Name, cookie.Value)
-
-		log.Println("Success! Go back home!")
-
-		c.Redirect(app.PinClient.MainURL)
+	if code == "" || state == "" || state != expectedState {
+		log.Printf("OAuth callback rejected (error=%q, has code: %t, state matches: %t)", c.Query("error"), code != "", state != "" && state == expectedState)
+		return c.Redirect(authFailedURL)
 	}
 
-	return nil
+	ctx, cancel := context.WithTimeout(c.UserContext(), requestTimeout)
+	defer cancel()
+
+	tokens, err := app.PinClient.FetchAccessToken(ctx, code)
+	if err != nil {
+		log.Printf("Token exchange failed: %v", err)
+		return c.Redirect(authFailedURL)
+	}
+
+	writeTokens(c, tokens)
+
+	return c.Redirect("/")
 }

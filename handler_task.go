@@ -7,20 +7,16 @@ import (
 )
 
 func taskHandler(c *fiber.Ctx) error {
-	taskId := c.Params("*")
-	taskId = strings.TrimSpace(taskId)
+	c.Set(fiber.HeaderCacheControl, "no-store")
 
-	task, exists := app.Tasks[taskId]
+	task, exists := app.Tasks.Get(strings.TrimSpace(c.Params("*")))
 
-	if exists {
-		if task.IsComplete {
-			c.SendString("complete")
-			return nil
-		} else {
-			c.SendString("processing")
-			return nil
-		}
+	switch {
+	case !exists:
+		return c.SendString("error")
+	case task.IsComplete():
+		return c.SendString("complete")
+	default:
+		return c.SendString("processing")
 	}
-	c.SendString("error")
-	return nil
 }
