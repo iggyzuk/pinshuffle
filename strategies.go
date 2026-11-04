@@ -15,9 +15,47 @@ const requestTimeout = 30 * time.Second
 
 type StrategyFunc func(c fiber.Ctx) (TemplateModel, error)
 
+// SectionsFunc lists the sections of one of the user's boards.
+type SectionsFunc func(c fiber.Ctx, boardId string) ([]Section, error)
+
+func GetMockSections(c fiber.Ctx, boardId string) ([]Section, error) {
+	return mockSections(boardId), nil
+}
+
+func GetSections(c fiber.Ctx, boardId string) ([]Section, error) {
+	tokens := readTokens(c)
+	if tokens.AccessToken == "" {
+		return nil, ErrUnauthorized
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), requestTimeout)
+	defer cancel()
+
+	return app.PinClient.WithToken(tokens.AccessToken).FetchSections(ctx, boardId)
+}
+
 func GetMockTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	tmplController := NewTemplateController()
 	tmplController.Mock(c.RequestCtx().URI())
+
+	followTask(c, tmplController, func(key string) *Task {
+		query := tmplController.Model.UrlQuery
+
+		expected := 0
+		if len(query.Sections) == 0 {
+			expected = len(query.Boards) * mockPagesPerTask * mockPinsPerPage
+		}
+
+		task := app.Tasks.New(key)
+		task.Describe(query, expected)
+		go task.Simulate()
+		return task
+	})
+
+	if !tmplController.Model.Loading {
+		tmplController.AddMockPins()
+	}
+
 	return tmplController.Model, nil
 }
 
@@ -28,7 +66,7 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	tokens := readTokens(c)
 
 	if tokens.Empty() {
-		showLoggedOut(c, model, "💭 Waiting for access to Pinterest account")
+		showLoggedOut(c, model, "Waiting for access to Pinterest account")
 		return *model, nil
 	}
 
@@ -42,7 +80,7 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	if errors.Is(err, ErrUnauthorized) {
 		log.Printf("Session ended: %v", err)
 		clearTokens(c)
-		showLoggedOut(c, model, "💭 Your Pinterest session has expired, please sign in again")
+		showLoggedOut(c, model, "Your Pinterest session has expired, please sign in again")
 		return *model, nil
 	}
 	if err != nil {
@@ -61,7 +99,7 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	// task for the next load, Pinterest might just be having a moment.
 	if len(account.Boards) == 0 {
 		if err == nil {
-			model.Message = "💭 No boards found"
+			model.Message = "No boards found"
 		}
 		return *model, nil
 	}
@@ -75,6 +113,50 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 		model.Error = parseErr.Error()
 	}
 
+	if err := tmplController.LoadSections(ctx, client.FetchSections); err != nil {
+		model.Error = err.Error()
+		return *model, nil
+	}
+
+	task := followTask(c, tmplController, func(key string) *Task {
+		query := model.UrlQuery
+
+		// Pinterest doesn't say how many pins are in a section.
+		expected := 0
+		if len(query.Sections) == 0 {
+			for _, boardId := range query.Boards {
+				expected += clientBoards[boardId].PinCount
+			}
+		}
+
+		task := app.Tasks.New(key)
+		task.Describe(query, expected)
+
+		// Runs after this response is sent, reloading the page when it's done.
+		go task.Process(client, query)
+
+		return task
+	})
+
+	if task != nil {
+		for i := range task.Pins {
+			tmplController.AddPin(&task.Pins[i])
+		}
+		if task.Error != "" {
+			model.Error = task.Error
+		} else if len(model.Pins) == 0 {
+			model.Message = "Nothing to show from what you selected"
+		}
+	}
+
+	return *model, nil
+}
+
+// followTask connects the page to the user's background task. It returns the
+// task once that's complete, and is done with it. If there's none yet for what's
+// selected then start makes one. Meanwhile the model is set to show it loading.
+func followTask(c fiber.Ctx, tmplController *TemplateController, start func(key string) *Task) *Task {
+	model := &tmplController.Model
 	key := taskKey(model.UrlQuery)
 
 	if taskId := c.Cookies(taskCookie); taskId != "" {
@@ -82,23 +164,14 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 
 		switch {
 		case exists && task.Key == key && task.IsComplete():
-			for i := range task.Pins {
-				tmplController.AddPin(&task.Pins[i])
-			}
-			if task.Error != "" {
-				model.Error = task.Error
-			} else if len(task.Pins) == 0 {
-				model.Message = "💭 No pins found on the selected boards"
-			}
 			app.Tasks.Delete(task.Id)
 			clearCookie(c, taskCookie)
-			return *model, nil
+			return task
 
 		case exists && task.Key == key:
-			model.Message = "Still processing your pins..."
 			model.Loading = true
 			model.TaskId = task.Id
-			return *model, nil
+			return nil
 		}
 
 		// The task is gone (the server restarted) or was for a different
@@ -109,18 +182,15 @@ func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 		clearCookie(c, taskCookie)
 	}
 
-	if len(model.UrlQuery.Boards) > 0 {
-		task := app.Tasks.New(key)
+	if len(model.UrlQuery.Sources()) > 0 {
+		task := start(key)
 		c.Cookie(sessionCookie(taskCookie, task.Id, time.Now().Add(taskTTL)))
-
-		// Runs after this response is sent, reloading the page when it's done.
-		go task.Process(client, clientBoards, model.UrlQuery)
 
 		model.Loading = true
 		model.TaskId = task.Id
 	}
 
-	return *model, nil
+	return nil
 }
 
 func showLoggedOut(c fiber.Ctx, model *TemplateModel, message string) {
@@ -129,7 +199,7 @@ func showLoggedOut(c fiber.Ctx, model *TemplateModel, message string) {
 
 	if c.Query("auth") == "failed" {
 		model.Message = ""
-		model.Error = "⚠️ Could not sign in with Pinterest, please try again."
+		model.Error = "Could not sign in with Pinterest, please try again."
 	}
 }
 

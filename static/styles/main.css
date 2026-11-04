@@ -78,12 +78,119 @@ body {
 
 #img-popup-src {
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(100vh - 7rem);
   margin: auto;
   display: block;
 }
 
-#shuffle-deck {
-  width: 225px;
-  z-index: 100;
+/* Sections line up in the list of boards, right after their own board. */
+.board-sections {
+  display: none;
 }
+
+#boards-list.show-sections .board-sections {
+  display: contents;
+}
+
+/* As wide as their name, which only wraps when it doesn't fit in a line at all. */
+.board-sections .col {
+  flex: 1 0 auto;
+  max-width: 100%;
+}
+
+.board-sections .btn {
+  max-width: 100%;
+}
+
+/* Sketchy hides these with display: none, leaving them out of keyboard navigation. */
+.btn-check {
+  display: block;
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+
+.btn-check:focus-visible + .btn {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Themes pick their accent color for buttons, not for text on any background. */
+#boards-list .btn-check:not(:checked) + .btn-outline-primary:not(:hover) {
+  color: inherit;
+}
+
+#task-progress {
+  display: grid;
+  place-items: center;
+  min-height: 80vh;
+  padding: 1rem;
+  text-align: center;
+}
+
+#task-progress > div {
+  width: min(24rem, 100%);
+}
+
+#shuffle-deck {
+  position: fixed;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 0.25rem;
+  width: 13.5rem;
+}
+
+.deck-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.25rem;
+  white-space: nowrap;
+}
+
+#shuffle-button {
+  grid-column: 1 / -1;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+
+/* Faces of the die, the pips are named by where they are. */
+.die {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.die circle {
+  display: none;
+  fill: #dd2e44;
+}
+
+.die:is([data-face="1"], [data-face="3"], [data-face="5"]) .c,
+.die:not([data-face="1"]) :is(.tl, .br),
+.die:is([data-face="4"], [data-face="5"], [data-face="6"]) :is(.tr, .bl),
+.die[data-face="6"] :is(.ml, .mr) {
+  display: inline;
+}
+
+/* A quiet tint, so it works on the buttons of every theme. */
+.deck-count {
+  padding: 0.15em 0.4em;
+  background-color: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  font-size: 0.65em;
+  font-weight: normal;
+}
+
+.deck-button:not(#shuffle-button) .deck-count {
+  font-size: 0.75em;
+}
+

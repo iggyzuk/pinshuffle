@@ -38,7 +38,7 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("⚠️ Pinterest error %d: %s", e.Status, e.Message)
+	return fmt.Sprintf("Pinterest error %d: %s", e.Status, e.Message)
 }
 
 func (e *APIError) Is(target error) bool {
@@ -91,17 +91,24 @@ type UserAccount struct {
 }
 
 type Board struct {
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	PinCount int    `json:"pin_count"`
+}
+
+type Section struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
 type Pin struct {
-	Id            string `json:"id"`
-	Title         string `json:"title"`
-	DominantColor string `json:"dominant_color"`
-	Media         Media  `json:"media"`
-	BoardId       string `json:"board_id"`
-	AltText       string `json:"alt_text"`
+	Id             string `json:"id"`
+	Title          string `json:"title"`
+	DominantColor  string `json:"dominant_color"`
+	Media          Media  `json:"media"`
+	BoardId        string `json:"board_id"`
+	BoardSectionId string `json:"board_section_id"`
+	AltText        string `json:"alt_text"`
 }
 
 type Media struct {
@@ -349,16 +356,38 @@ func (client *PinterestClient) FetchUserAccount(ctx context.Context) (*UserAccou
 }
 
 func (client *PinterestClient) FetchBoards(ctx context.Context) ([]Board, error) {
-	return fetchAllPages[Board](ctx, client, "/boards/?page_size=100")
+	return fetchAllPages[Board](ctx, client, "/boards/?page_size=100", nil)
 }
 
-func (client *PinterestClient) FetchAllPins(ctx context.Context, board Board) ([]Pin, error) {
-	return fetchAllPages[Pin](ctx, client, "/boards/"+url.PathEscape(board.Id)+"/pins?page_size=100")
+func (client *PinterestClient) FetchAllPins(ctx context.Context, board Board, onPage func(count int)) ([]Pin, error) {
+	return fetchAllPages[Pin](ctx, client, "/boards/"+url.PathEscape(board.Id)+"/pins?page_size=100", onPage)
+}
+
+func (client *PinterestClient) FetchSections(ctx context.Context, boardId string) ([]Section, error) {
+	return fetchAllPages[Section](ctx, client, "/boards/"+url.PathEscape(boardId)+"/sections?page_size=100", nil)
+}
+
+func (client *PinterestClient) FetchSectionPins(ctx context.Context, boardId, sectionId string, onPage func(count int)) ([]Pin, error) {
+	endpoint := "/boards/" + url.PathEscape(boardId) + "/sections/" + url.PathEscape(sectionId) + "/pins?page_size=100"
+
+	pins, err := fetchAllPages[Pin](ctx, client, endpoint, onPage)
+	if err != nil {
+		return nil, err
+	}
+
+	// We know where they're from, whatever the response says.
+	for i := range pins {
+		pins[i].BoardId = boardId
+		pins[i].BoardSectionId = sectionId
+	}
+
+	return pins, nil
 }
 
 // fetchAllPages follows bookmarks until the list is exhausted. The endpoint must
-// already have a query string.
-func fetchAllPages[T any](ctx context.Context, client *PinterestClient, endpoint string) ([]T, error) {
+// already have a query string. onPage is told how many items each page brought,
+// if it's set.
+func fetchAllPages[T any](ctx context.Context, client *PinterestClient, endpoint string, onPage func(count int)) ([]T, error) {
 	var items []T
 	bookmark := ""
 
@@ -379,6 +408,10 @@ func fetchAllPages[T any](ctx context.Context, client *PinterestClient, endpoint
 		}
 
 		items = append(items, current.Items...)
+
+		if onPage != nil {
+			onPage(len(current.Items))
+		}
 
 		// A repeated bookmark would otherwise loop forever.
 		if current.Bookmark == "" || current.Bookmark == bookmark {

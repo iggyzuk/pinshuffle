@@ -102,13 +102,13 @@ func TestPartialFailureKeepsOtherBoards(t *testing.T) {
 	var active, peak atomic.Int32
 	client := newTestClient(t, boardsHandler("broken", &active, &peak))
 
-	boards := map[string]Board{"ok": {Id: "ok"}, "broken": {Id: "broken"}}
-	pins, err := NewRandomizer(client, boards).GetRandomizedPins(context.Background(), 10, []string{"ok", "broken"})
+	sources := []PinSource{{BoardId: "ok"}, {BoardId: "broken"}}
+	pins, err := NewRandomizer(client, NewTaskStore().New("key")).GetRandomizedPins(context.Background(), 10, sources)
 
 	if len(pins) != 1 {
 		t.Fatalf("got %d pins", len(pins))
 	}
-	if err == nil || !strings.Contains(err.Error(), "1 of 2 boards") {
+	if err == nil || !strings.Contains(err.Error(), "1 of 2 selected") {
 		t.Fatalf("got %v", err)
 	}
 }
@@ -117,14 +117,12 @@ func TestEveryFailureIsReportedWithoutLeaking(t *testing.T) {
 	var active, peak atomic.Int32
 	client := newTestClient(t, boardsHandler("boards", &active, &peak))
 
-	ids := make([]string, 20)
-	boards := map[string]Board{}
-	for i := range ids {
-		ids[i] = fmt.Sprint(i)
-		boards[ids[i]] = Board{Id: ids[i]}
+	sources := make([]PinSource, 20)
+	for i := range sources {
+		sources[i] = PinSource{BoardId: fmt.Sprint(i)}
 	}
 
-	_, err := NewRandomizer(client, boards).GetRandomizedPins(context.Background(), 10, ids)
+	_, err := NewRandomizer(client, NewTaskStore().New("key")).GetRandomizedPins(context.Background(), 10, sources)
 
 	var apiErr *APIError
 	if !errors.As(err, &apiErr) {
@@ -132,5 +130,22 @@ func TestEveryFailureIsReportedWithoutLeaking(t *testing.T) {
 	}
 	if peak.Load() > maxConcurrentBoards {
 		t.Fatalf("%d concurrent requests", peak.Load())
+	}
+}
+
+func TestSectionPinsComeFromTheSection(t *testing.T) {
+	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/boards/b1/sections/s1/pins" {
+			t.Errorf("requested %s", r.URL.Path)
+		}
+		fmt.Fprint(w, `{"items":[{"id":"1"}]}`)
+	})
+
+	pins, err := NewRandomizer(client, NewTaskStore().New("key")).GetRandomizedPins(context.Background(), 10, []PinSource{{BoardId: "b1", SectionId: "s1"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pins) != 1 || pins[0].BoardId != "b1" || pins[0].BoardSectionId != "s1" {
+		t.Fatalf("got %+v", pins)
 	}
 }
