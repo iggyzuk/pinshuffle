@@ -1,25 +1,16 @@
 function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
+    const name = cname + "=";
+    for (const part of document.cookie.split(';')) {
+        const cookie = part.trimStart();
+        if (cookie.startsWith(name)) {
+            return cookie.substring(name.length);
         }
     }
     return "";
 }
 
 function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
+    const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function eraseCookie(cname) {   
-    document.cookie = cname + '=; Max-Age=-99999999;';  
+    document.cookie = cname + "=" + cvalue + ";expires=" + d.toUTCString() + ";path=/;SameSite=Lax";
 }

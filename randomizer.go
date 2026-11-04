@@ -1,100 +1,115 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"math/rand"
-	"time"
+	"sync"
 )
+
+// Boards are fetched in parallel, but a user can select hundreds of them and
+// each needs several requests against Pinterest's rate limit.
+const maxConcurrentBoards = 4
 
 type Randomizer struct {
 	Client       *PinterestClient
 	ClientBoards map[string]Board
-	BoardIds     []string
-	Max          int
-	PinsPerBoard int
-}
-
-type PinsResult struct {
-	Id    string
-	Pins  []Pin
-	Error error
 }
 
 func NewRandomizer(client *PinterestClient, clientBoards map[string]Board) *Randomizer {
 	return &Randomizer{Client: client, ClientBoards: clientBoards}
 }
 
-// Randomizer fetches pins from selected boards and trims them with the max value specified.
-func (rnd *Randomizer) GetRandomizedPins(max int, boardIds []string) ([]Pin, error) {
-	rand.Seed(time.Now().UnixNano())
-	rnd.Max = max
-	rnd.ProccessBoards(boardIds)
-	return rnd.FetchPinsFromSelectedBoards()
+// GetRandomizedPins fetches every pin of the selected boards and returns up to
+// max of them in random order. If only some boards fail it returns the pins of
+// the others along with the error.
+func (rnd *Randomizer) GetRandomizedPins(ctx context.Context, max int, boardIds []string) ([]Pin, error) {
+	perBoard := make([][]Pin, len(boardIds))
+	errs := make([]error, len(boardIds))
+
+	slots := make(chan struct{}, maxConcurrentBoards)
+	var wg sync.WaitGroup
+
+	for i, boardId := range boardIds {
+		wg.Add(1)
+		go func(i int, board Board) {
+			defer wg.Done()
+
+			// A panic here is out of reach of the task's recover, and would take
+			// down the server for everyone.
+			defer func() {
+				if r := recover(); r != nil {
+					errs[i] = fmt.Errorf("panic while loading board %s: %v", board.Id, r)
+				}
+			}()
+
+			slots <- struct{}{}
+			defer func() { <-slots }()
+
+			perBoard[i], errs[i] = rnd.Client.FetchAllPins(ctx, board)
+			log.Printf("Received %d pins from board %s", len(perBoard[i]), board.Id)
+		}(i, rnd.ClientBoards[boardId])
+	}
+
+	wg.Wait()
+
+	return selectPins(perBoard, max), summarizeErrors(errs)
 }
 
-func (rnd *Randomizer) ProccessBoards(boardIds []string) {
-	rnd.BoardIds = boardIds
-
-	boardCount := len(rnd.BoardIds)
-
-	if boardCount > 0 {
-		rnd.PinsPerBoard = rnd.Max / boardCount
+// selectPins takes pins from each board in turn so that small boards aren't
+// drowned out, and boards with spare pins fill the share of those that ran out.
+func selectPins(perBoard [][]Pin, max int) []Pin {
+	for _, pins := range perBoard {
+		shufflePins(pins)
 	}
-}
+	rand.Shuffle(len(perBoard), func(i, j int) {
+		perBoard[i], perBoard[j] = perBoard[j], perBoard[i]
+	})
 
-func (rnd *Randomizer) FetchPinsFromSelectedBoards() ([]Pin, error) {
+	selected := []Pin{}
 
-	resultChan := make(chan PinsResult)
+	for depth := 0; len(selected) < max; depth++ {
+		exhausted := true
 
-	for _, boardId := range rnd.BoardIds {
-
-		go func(id string) {
-			board := rnd.ClientBoards[id]
-			pins, err := rnd.FetchSomePinsFromBoard(board)
-			resultChan <- PinsResult{Id: board.Name, Pins: pins, Error: err}
-		}(boardId)
-	}
-
-	allPins := []Pin{}
-
-	for i := 0; i < len(rnd.BoardIds); i++ {
-
-		r := <-resultChan
-		fmt.Printf("Received %d pins from %s \n", len(r.Pins), r.Id)
-
-		if r.Error != nil {
-			return nil, r.Error
+		for _, pins := range perBoard {
+			if depth < len(pins) && len(selected) < max {
+				selected = append(selected, pins[depth])
+				exhausted = false
+			}
 		}
-		allPins = append(allPins, r.Pins...)
+
+		if exhausted {
+			break
+		}
 	}
 
-	return allPins, nil
+	shufflePins(selected)
+
+	return selected
 }
 
-func (rnd *Randomizer) FetchSomePinsFromBoard(board Board) ([]Pin, error) {
+func shufflePins(pins []Pin) {
+	rand.Shuffle(len(pins), func(i, j int) {
+		pins[i], pins[j] = pins[j], pins[i]
+	})
+}
 
-	fmt.Printf("Request some pins from %s\n", board.Name)
+func summarizeErrors(errs []error) error {
+	var first error
+	failed := 0
 
-	allPins, err := rnd.Client.FetchAllPins(board)
-
-	if err != nil {
-		return nil, err
+	for _, err := range errs {
+		if err != nil {
+			failed++
+			if first == nil {
+				first = err
+			}
+		}
 	}
 
-	trimmedPins := rnd.Trim(allPins, rnd.PinsPerBoard)
-
-	return trimmedPins, nil
-}
-
-func (rnd *Randomizer) Trim(pins []Pin, limit int) []Pin {
-	for len(pins) > limit {
-		pins = rnd.Remove(pins, rand.Intn(len(pins)))
+	if first == nil {
+		return nil
 	}
-	return pins
-}
-
-func (rnd *Randomizer) Remove(pins []Pin, i int) []Pin {
-	pins[i] = pins[len(pins)-1]
-	// We do not need to put s[i] at the end, as it will be discarded anyway
-	return pins[:len(pins)-1]
+	return fmt.Errorf("%d of %d boards failed to load: %w", failed, len(errs), first)
 }

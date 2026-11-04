@@ -3,11 +3,18 @@ package main
 import (
 	"fmt"
 	"net/url"
-	"sort"
+	"slices"
 	"strconv"
 
 	"github.com/valyala/fasthttp"
-	"golang.org/x/exp/maps"
+)
+
+const (
+	defaultMaxPins         = 100
+	minMaxPins             = 1
+	maxMaxPins             = 10000
+	defaultImageResolution = 1
+	maxImageResolution     = 3
 )
 
 type TemplateController struct {
@@ -16,7 +23,6 @@ type TemplateController struct {
 
 // TemplateModel is the main object we pass for templating HTML
 type TemplateModel struct {
-	OAuthURL      string
 	Authenticated bool
 	User          TemplateUser
 	Boards        map[string]*TemplateBoard
@@ -24,8 +30,8 @@ type TemplateModel struct {
 	Error         string
 	Message       string
 	UrlQuery      TemplateUrlQuery
-	ImageSize     int
 	Loading       bool
+	TaskId        string
 }
 
 type TemplateUser struct {
@@ -44,6 +50,8 @@ type TemplatePin struct {
 	Name     string
 	Color    string
 	ImageURL string
+	Width    int
+	Height   int
 	AltText  string
 	Board    *TemplateBoard
 }
@@ -55,35 +63,22 @@ type TemplateUrlQuery struct {
 }
 
 func (query TemplateUrlQuery) GetImageResolution(images Images) Image {
-	imgRes := query.ImageResolution
-
-	if imgRes == 0 {
+	switch query.ImageResolution {
+	case 0:
 		return images.Res150x150
-	}
-	if imgRes == 1 {
+	case 2:
+		return images.Res600x
+	case 3:
+		return images.Res1200x
+	default:
 		return images.Res400x300
 	}
-	if imgRes == 2 {
-		return images.Res600x
-	}
-	if imgRes == 3 {
-		return images.Res1200x
-	}
-	return images.Res400x300
 }
 
-func NewTemplateController(authUrl string) *TemplateController {
+func NewTemplateController() *TemplateController {
 	return &TemplateController{
 		Model: TemplateModel{
-			OAuthURL:      authUrl,
-			Authenticated: false,
-			User:          TemplateUser{},
-			Boards:        make(map[string]*TemplateBoard),
-			Pins:          nil,
-			Error:         "",
-			Message:       "",
-			UrlQuery:      TemplateUrlQuery{},
-			ImageSize:     3,
+			Boards: make(map[string]*TemplateBoard),
 		},
 	}
 }
@@ -92,35 +87,29 @@ func (tc *TemplateController) AddBoard(board *TemplateBoard) {
 	tc.Model.Boards[board.Id] = board
 }
 
-func (tc *TemplateController) GetBoards() []*TemplateBoard {
-	return maps.Values(tc.Model.Boards)
-}
-
-func (tc *TemplateController) GetBoardsSorted() []*TemplateBoard {
-
-	boardList := tc.GetBoards()
-
-	sort.SliceStable(boardList, func(i, j int) bool {
-		return boardList[i].Name < boardList[j].Name
-	})
-
-	return boardList
-}
-
 func (tc *TemplateController) AddPin(pin *Pin) {
+	// The board can be gone by now, if it was deleted while the task was running.
+	board, exists := tc.Model.Boards[pin.BoardId]
+	if !exists {
+		board = &TemplateBoard{}
+	}
+
+	image := tc.Model.UrlQuery.GetImageResolution(pin.Media.Images)
+
 	tc.Model.Pins = append(tc.Model.Pins, TemplatePin{
 		Id:       pin.Id,
 		Name:     pin.Title,
 		Color:    pin.DominantColor,
-		ImageURL: tc.Model.UrlQuery.GetImageResolution(pin.Media.Images).Url,
+		ImageURL: image.Url,
+		Width:    image.Width,
+		Height:   image.Height,
 		AltText:  pin.AltText,
-		Board:    tc.Model.Boards[pin.BoardId],
+		Board:    board,
 	})
 }
 
 func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 
-	tc.Model.OAuthURL = ""
 	tc.Model.Authenticated = true
 
 	tc.Model.User = TemplateUser{Name: "Iggy Zuk", IconURL: "https://iggyzuk.com/img/profile/iggy.jpg", URL: "#"}
@@ -155,9 +144,9 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 
 	tc.ParseUrlQueries(uri, clientBoards)
 
-	boardList := tc.GetBoardsSorted()
+	boardList := SortBoards(tc.Model.Boards)
 
-	tc.Model.Pins = []TemplatePin{
+	mockPins := []TemplatePin{
 		{Id: "#1", Name: "Iggy", Color: "#000000", ImageURL: "https://iggyzuk.com/img/profile/iggy.jpg", Board: boardList[0], AltText: "Iggy Zuky"},
 		{Id: "#2", Name: "Deadly 30", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/deadly-30/img/d30.gif", Board: boardList[0]},
 		{Id: "#3", Name: "Kings", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/kings/img/kings.png", Board: boardList[0]},
@@ -170,6 +159,13 @@ func (tc *TemplateController) Mock(uri *fasthttp.URI) {
 		{Id: "#10", Name: "Game Coding Complete", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/books/game-coding.jpg", Board: boardList[2]},
 		{Id: "#11", Name: "Code", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/game-engine/img/code.png", Board: boardList[2]},
 		{Id: "#12", Name: "Forest Monster", Color: "#000000", ImageURL: "https://iggyzuk.com/projects/forest-monster/img/design/depth.jpg", Board: boardList[2]},
+	}
+
+	// Repeat the pins up to max, to have enough of them to fill the page.
+	for i := 0; i < tc.Model.UrlQuery.Max; i++ {
+		pin := mockPins[i%len(mockPins)]
+		pin.Id = fmt.Sprintf("#%d", i+1)
+		tc.Model.Pins = append(tc.Model.Pins, pin)
 	}
 
 	tc.Model.Message = "Mock"
@@ -191,54 +187,31 @@ func (tc *TemplateController) ParseUrlQueries(uri *fasthttp.URI, clientBoards ma
 		return err
 	}
 
-	// Max.
-	tc.Model.UrlQuery.Max = 100
+	query := &tc.Model.UrlQuery
 
-	if queryMap["max"] != nil {
-		maxString := queryMap["max"][0]
-		maxInt, err := strconv.Atoi(maxString)
+	query.Max = parseIntInRange(queryMap, "max", defaultMaxPins, minMaxPins, maxMaxPins)
+	query.ImageResolution = parseIntInRange(queryMap, "res", defaultImageResolution, 0, maxImageResolution)
 
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			tc.Model.UrlQuery.Max = maxInt
+	for _, boardId := range queryMap["b"] {
+		board, exists := clientBoards[boardId]
+		if exists && !slices.Contains(query.Boards, board.Id) {
+			query.Boards = append(query.Boards, board.Id)
 		}
 	}
 
-	// Boards.
-	if queryMap["b"] != nil {
-		for _, boardId := range queryMap["b"] {
-
-			board, exists := clientBoards[boardId]
-			if exists {
-				tc.Model.UrlQuery.Boards = append(tc.Model.UrlQuery.Boards, board.Id)
-			}
-		}
-	}
-
-	for _, val := range clientBoards {
-
-		newTemplateBoard := &TemplateBoard{
-			Id:   val.Id,
-			Name: val.Name,
-		}
-
-		tc.AddBoard(newTemplateBoard)
-	}
-
-	// Image size.
-	tc.Model.UrlQuery.ImageResolution = 1
-
-	if queryMap["res"] != nil {
-		maxString := queryMap["res"][0]
-		imgResInt, err := strconv.Atoi(maxString)
-
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			tc.Model.UrlQuery.ImageResolution = imgResInt
-		}
+	for _, board := range clientBoards {
+		tc.AddBoard(&TemplateBoard{Id: board.Id, Name: board.Name})
 	}
 
 	return nil
+}
+
+// parseIntInRange reads a query value, limiting it to [low, high]. Anything that
+// isn't a number gets the default.
+func parseIntInRange(queryMap url.Values, key string, defaultValue, low, high int) int {
+	value, err := strconv.Atoi(queryMap.Get(key))
+	if err != nil {
+		return defaultValue
+	}
+	return max(low, min(value, high))
 }

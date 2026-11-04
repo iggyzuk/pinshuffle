@@ -19,4 +19,21 @@
 
 <img src="docs/shuffle-anim.gif" width="100%">
 
+## Running it
+
+Create a `.env` file with the credentials of your Pinterest app:
+
+| Variable | Description |
+| --- | --- |
+| `CLIENT_ID`, `CLIENT_SECRET` | Pinterest app credentials |
+| `BASE_URL` | Optional. Where the app is hosted, defaults to production. `{BASE_URL}/redirect/` must be registered as a redirect URI |
+| `PORT` | Optional. Defaults to `8275` |
+| `MONITOR_PASSWORD` | Optional. Enables `/monitor`, log in as `admin` |
+
+```sh
+go run .        # real thing
+go run . -mock  # fake data, no Pinterest account required
+go test ./...
+```
+
 Feel free to contribute.
