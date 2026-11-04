@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/template/html/v2"
+	"github.com/gofiber/template/html/v3"
 	"github.com/valyala/fasthttp"
 )
 

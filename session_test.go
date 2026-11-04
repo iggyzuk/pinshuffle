@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 func TestNeedsRefresh(t *testing.T) {
@@ -76,7 +76,7 @@ func newTestServer(t *testing.T, pinterest http.Handler) *fiber.App {
 	app.PinClient.RetryDelay = time.Millisecond
 
 	server := fiber.New(fiber.Config{Immutable: true})
-	server.Get("/", func(c *fiber.Ctx) error {
+	server.Get("/", func(c fiber.Ctx) error {
 		model, err := app.Func(c)
 		if err != nil {
 			return err
@@ -103,7 +103,7 @@ func request(t *testing.T, server *fiber.App, method, target string, cookies map
 		req.AddCookie(&http.Cookie{Name: name, Value: value})
 	}
 
-	resp, err := server.Test(req, 5000)
+	resp, err := server.Test(req, fiber.TestConfig{Timeout: 5 * time.Second})
 	if err != nil {
 		t.Fatal(err)
 	}

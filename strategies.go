@@ -7,21 +7,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // Upper limit for loading the user's account while they wait for the page.
 const requestTimeout = 30 * time.Second
 
-type StrategyFunc func(c *fiber.Ctx) (TemplateModel, error)
+type StrategyFunc func(c fiber.Ctx) (TemplateModel, error)
 
-func GetMockTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
+func GetMockTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	tmplController := NewTemplateController()
-	tmplController.Mock(c.Context().URI())
+	tmplController.Mock(c.RequestCtx().URI())
 	return tmplController.Model, nil
 }
 
-func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
+func GetTemplateModel(c fiber.Ctx) (TemplateModel, error) {
 	tmplController := NewTemplateController()
 	model := &tmplController.Model
 
@@ -34,7 +34,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 
 	model.Authenticated = true
 
-	ctx, cancel := context.WithTimeout(c.UserContext(), requestTimeout)
+	ctx, cancel := context.WithTimeout(c.Context(), requestTimeout)
 	defer cancel()
 
 	client, account, err := loadAccount(ctx, c, tokens)
@@ -71,7 +71,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 		clientBoards[board.Id] = board
 	}
 
-	if parseErr := tmplController.ParseUrlQueries(c.Context().URI(), clientBoards); parseErr != nil {
+	if parseErr := tmplController.ParseUrlQueries(c.RequestCtx().URI(), clientBoards); parseErr != nil {
 		model.Error = parseErr.Error()
 	}
 
@@ -123,7 +123,7 @@ func GetTemplateModel(c *fiber.Ctx) (TemplateModel, error) {
 	return *model, nil
 }
 
-func showLoggedOut(c *fiber.Ctx, model *TemplateModel, message string) {
+func showLoggedOut(c fiber.Ctx, model *TemplateModel, message string) {
 	model.Authenticated = false
 	model.Message = message
 
@@ -144,7 +144,7 @@ type Account struct {
 //
 // ErrUnauthorized means the session can't be saved and the user has to log in.
 // Any other error can come with a partially filled account.
-func loadAccount(ctx context.Context, c *fiber.Ctx, tokens Tokens) (*PinterestClient, Account, error) {
+func loadAccount(ctx context.Context, c fiber.Ctx, tokens Tokens) (*PinterestClient, Account, error) {
 	refreshed := false
 
 	if tokens.NeedsRefresh(time.Now()) {

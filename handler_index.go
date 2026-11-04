@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func indexHandler(c *fiber.Ctx) error {
+func indexHandler(c fiber.Ctx) error {
 
 	model, err := app.Func(c)
 

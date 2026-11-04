@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 const (
@@ -46,7 +46,7 @@ func (t Tokens) NeedsRefresh(now time.Time) bool {
 	return t.AccessToken == "" || (!t.ExpiresAt.IsZero() && now.Add(refreshMargin).After(t.ExpiresAt))
 }
 
-func readTokens(c *fiber.Ctx) Tokens {
+func readTokens(c fiber.Ctx) Tokens {
 	tokens := Tokens{
 		AccessToken:  c.Cookies(accessTokenCookie),
 		RefreshToken: c.Cookies(refreshTokenCookie),
@@ -70,11 +70,11 @@ func sessionCookie(name, value string, expires time.Time) *fiber.Cookie {
 	}
 }
 
-func clearCookie(c *fiber.Ctx, name string) {
+func clearCookie(c fiber.Ctx, name string) {
 	c.Cookie(sessionCookie(name, "", time.Unix(1, 0)))
 }
 
-func writeTokens(c *fiber.Ctx, tokens Tokens) {
+func writeTokens(c fiber.Ctx, tokens Tokens) {
 	// Keep the access token's cookie alive for a year if its lifetime is unknown,
 	// matching how long these cookies have always lasted.
 	expires := tokens.ExpiresAt
@@ -92,7 +92,7 @@ func writeTokens(c *fiber.Ctx, tokens Tokens) {
 	}
 }
 
-func clearTokens(c *fiber.Ctx) {
+func clearTokens(c fiber.Ctx) {
 	clearCookie(c, accessTokenCookie)
 	clearCookie(c, refreshTokenCookie)
 	clearCookie(c, tokenExpiryCookie)

@@ -19,16 +19,11 @@ body {
   min-height: calc(100vh + 1px);
 }
 
-/* The transparent borders are the gaps between images, but on the outside they
-   would keep the images from reaching the edges of the page. So the grid sticks
-   out by one border, and that part gets cut off. */
-.grid-bleed {
-  overflow-x: clip;
-}
-
+/* The gap between two images is the transparent border of both. One more border
+   around the grid makes the space around the page the same size as that gap. */
 .grid {
   position: relative;
-  margin-inline: calc(-1 * var(--border));
+  margin: var(--border);
 }
 
 /* Packery takes its column width from the sizer. */

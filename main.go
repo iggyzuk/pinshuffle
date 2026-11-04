@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"log"
 	"os"
 	"os/signal"
@@ -9,13 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/template/html/v2"
+	"github.com/gofiber/contrib/v3/monitor"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/basicauth"
+	"github.com/gofiber/fiber/v3/middleware/compress"
+	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v3/middleware/recover"
+	"github.com/gofiber/fiber/v3/middleware/static"
+	"github.com/gofiber/template/html/v3"
 	"github.com/joho/godotenv"
 )
 
@@ -49,7 +52,7 @@ func NewApp() App {
 
 var app App
 
-func securityHeaders(c *fiber.Ctx) error {
+func securityHeaders(c fiber.Ctx) error {
 	c.Set(fiber.HeaderXContentTypeOptions, "nosniff")
 
 	// The monitor page is the only one that needs inline scripts.
@@ -89,13 +92,15 @@ func main() {
 
 	// Server stats aren't for the public: they need MONITOR_PASSWORD to be set.
 	if password := os.Getenv("MONITOR_PASSWORD"); password != "" {
+		hash := sha256.Sum256([]byte(password))
+
 		server.Use("/monitor", basicauth.New(basicauth.Config{
-			Users: map[string]string{"admin": password},
+			Users: map[string]string{"admin": "{SHA256}" + base64.StdEncoding.EncodeToString(hash[:])},
 		}), monitor.New())
 	}
 
 	// Load static files like CSS, Images & JavaScript.
-	server.Static("/static", "./static")
+	server.Use("/static", static.New("./static"))
 
 	server.Get("/", indexHandler)
 	server.Get("/login", loginHandler)
@@ -104,26 +109,10 @@ func main() {
 	server.Get("/task/*", taskHandler)
 	server.Get("/privacy", privacyHandler)
 
-	// 404 handler.
-	server.Use(func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotFound)
-	})
-
 	// Throw away results that nobody came back for.
 	go func() {
 		for now := range time.Tick(time.Minute) {
 			app.Tasks.DeleteExpired(now)
-		}
-	}()
-
-	// Finish requests in flight when Fly stops the machine.
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
-	go func() {
-		<-ctx.Done()
-		if err := server.ShutdownWithTimeout(10 * time.Second); err != nil {
-			log.Printf("Shutdown: %v", err)
 		}
 	}()
 
@@ -136,7 +125,12 @@ func main() {
 	}
 
 	// Start server on http://${fly-url}:${port}
-	if err := server.Listen(":" + port); err != nil {
+	// Requests in flight get to finish when Fly stops the machine.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	err := server.Listen(":"+port, fiber.ListenConfig{GracefulContext: ctx})
+	if err != nil {
 		log.Fatal(err)
 	}
 }

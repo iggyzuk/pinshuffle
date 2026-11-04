@@ -3,10 +3,10 @@ package main
 import (
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func taskHandler(c *fiber.Ctx) error {
+func taskHandler(c fiber.Ctx) error {
 	c.Set(fiber.HeaderCacheControl, "no-store")
 
 	task, exists := app.Tasks.Get(strings.TrimSpace(c.Params("*")))
