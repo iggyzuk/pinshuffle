@@ -24,16 +24,19 @@ import (
 
 // Fonts are imported by the themes, scripts and privacy page styles come from CDNs,
 // pin images from Pinterest. Inline styles are for the dominant color of each pin.
+// Connecting to jsDelivr is only for devtools, to get Bootstrap's source map.
 const contentSecurityPolicy = "default-src 'self'; " +
 	"script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
 	"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 	"font-src 'self' data: https://fonts.gstatic.com; " +
+	"connect-src 'self' https://cdn.jsdelivr.net; " +
 	"img-src 'self' data: https:; " +
 	"object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 
 type App struct {
 	PinClient *PinterestClient
 	Func      StrategyFunc
+	Sections  SectionsFunc
 	Tasks     *TaskStore
 }
 
@@ -41,11 +44,14 @@ func NewApp() App {
 	app := App{
 		PinClient: NewClient(),
 		Func:      GetTemplateModel,
+		Sections:  GetSections,
 		Tasks:     NewTaskStore(),
 	}
 	// Use real or mock index strategy when you find "-mock" argument
 	if len(os.Args) > 1 && os.Args[1] == "-mock" {
+		app.PinClient.MainURL = "" // Cookies shouldn't need https on localhost.
 		app.Func = GetMockTemplateModel
+		app.Sections = GetMockSections
 	}
 	return app
 }
@@ -107,6 +113,7 @@ func main() {
 	server.Post("/logout", logoutHandler)
 	server.Get("/redirect", authRedirectHandler)
 	server.Get("/task/*", taskHandler)
+	server.Get("/boards/:id/sections", sectionsHandler)
 	server.Get("/privacy", privacyHandler)
 
 	// Throw away results that nobody came back for.

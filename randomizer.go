@@ -12,59 +12,87 @@ import (
 // each needs several requests against Pinterest's rate limit.
 const maxConcurrentBoards = 4
 
+// PinSource is somewhere to get pins from: a whole board, or one of its sections
+// if SectionId is set.
+type PinSource struct {
+	BoardId   string
+	SectionId string
+}
+
+func (source PinSource) String() string {
+	if source.SectionId != "" {
+		return "section " + source.SectionId
+	}
+	return "board " + source.BoardId
+}
+
+func (source PinSource) fetch(ctx context.Context, client *PinterestClient, onPage func(count int)) ([]Pin, error) {
+	if source.SectionId != "" {
+		return client.FetchSectionPins(ctx, source.BoardId, source.SectionId, onPage)
+	}
+	return client.FetchAllPins(ctx, Board{Id: source.BoardId}, onPage)
+}
+
+// ProgressReporter hears how fetching is going.
+type ProgressReporter interface {
+	AddPins(count int)
+	SourceDone()
+}
+
 type Randomizer struct {
-	Client       *PinterestClient
-	ClientBoards map[string]Board
+	Client   *PinterestClient
+	Progress ProgressReporter
 }
 
-func NewRandomizer(client *PinterestClient, clientBoards map[string]Board) *Randomizer {
-	return &Randomizer{Client: client, ClientBoards: clientBoards}
+func NewRandomizer(client *PinterestClient, progress ProgressReporter) *Randomizer {
+	return &Randomizer{Client: client, Progress: progress}
 }
 
-// GetRandomizedPins fetches every pin of the selected boards and returns up to
-// max of them in random order. If only some boards fail it returns the pins of
-// the others along with the error.
-func (rnd *Randomizer) GetRandomizedPins(ctx context.Context, max int, boardIds []string) ([]Pin, error) {
-	perBoard := make([][]Pin, len(boardIds))
-	errs := make([]error, len(boardIds))
+// GetRandomizedPins fetches every pin of the sources and returns up to max of
+// them in random order. If only some sources fail it returns the pins of the
+// others along with the error.
+func (rnd *Randomizer) GetRandomizedPins(ctx context.Context, max int, sources []PinSource) ([]Pin, error) {
+	perSource := make([][]Pin, len(sources))
+	errs := make([]error, len(sources))
 
 	slots := make(chan struct{}, maxConcurrentBoards)
 	var wg sync.WaitGroup
 
-	for i, boardId := range boardIds {
+	for i, source := range sources {
 		wg.Add(1)
-		go func(i int, board Board) {
+		go func(i int, source PinSource) {
 			defer wg.Done()
+			defer rnd.Progress.SourceDone()
 
 			// A panic here is out of reach of the task's recover, and would take
 			// down the server for everyone.
 			defer func() {
 				if r := recover(); r != nil {
-					errs[i] = fmt.Errorf("panic while loading board %s: %v", board.Id, r)
+					errs[i] = fmt.Errorf("panic while loading %s: %v", source, r)
 				}
 			}()
 
 			slots <- struct{}{}
 			defer func() { <-slots }()
 
-			perBoard[i], errs[i] = rnd.Client.FetchAllPins(ctx, board)
-			log.Printf("Received %d pins from board %s", len(perBoard[i]), board.Id)
-		}(i, rnd.ClientBoards[boardId])
+			perSource[i], errs[i] = source.fetch(ctx, rnd.Client, rnd.Progress.AddPins)
+			log.Printf("Received %d pins from %s", len(perSource[i]), source)
+		}(i, source)
 	}
 
 	wg.Wait()
 
-	return selectPins(perBoard, max), summarizeErrors(errs)
+	return selectPins(perSource, max), summarizeErrors(errs)
 }
 
-// selectPins takes pins from each board in turn so that small boards aren't
-// drowned out, and boards with spare pins fill the share of those that ran out.
-func selectPins(perBoard [][]Pin, max int) []Pin {
-	for _, pins := range perBoard {
+// selectPins takes pins from each source in turn so that small ones aren't
+// drowned out, and sources with spare pins fill the share of those that ran out.
+func selectPins(perSource [][]Pin, max int) []Pin {
+	for _, pins := range perSource {
 		shufflePins(pins)
 	}
-	rand.Shuffle(len(perBoard), func(i, j int) {
-		perBoard[i], perBoard[j] = perBoard[j], perBoard[i]
+	rand.Shuffle(len(perSource), func(i, j int) {
+		perSource[i], perSource[j] = perSource[j], perSource[i]
 	})
 
 	selected := []Pin{}
@@ -72,7 +100,7 @@ func selectPins(perBoard [][]Pin, max int) []Pin {
 	for depth := 0; len(selected) < max; depth++ {
 		exhausted := true
 
-		for _, pins := range perBoard {
+		for _, pins := range perSource {
 			if depth < len(pins) && len(selected) < max {
 				selected = append(selected, pins[depth])
 				exhausted = false
@@ -111,5 +139,5 @@ func summarizeErrors(errs []error) error {
 	if first == nil {
 		return nil
 	}
-	return fmt.Errorf("%d of %d boards failed to load: %w", failed, len(errs), first)
+	return fmt.Errorf("%d of %d selected boards and sections failed to load: %w", failed, len(errs), first)
 }

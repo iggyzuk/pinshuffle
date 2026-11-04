@@ -15,12 +15,15 @@
   <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon/favicon-16x16.png">
   <link rel="manifest" href="static/images/favicon/site.webmanifest">
-  <link rel="stylesheet" id="theme" href="static/styles/themes/morph.min.css">
+  <link rel="stylesheet" id="theme" href="static/styles/themes/sketchy.min.css">
   <link rel="stylesheet" href="static/styles/main.css">
+  <link rel="stylesheet" href="static/styles/emoji.css">
 
   <!-- JavaScript Bundle with Popper -->
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/packery/2.1.2/packery.pkgd.min.js" integrity="sha384-oDkIpS8P/WkhvJZRketv7d32JVt7Rc2ZpaZV4sEDokacrFvLBs1q1vlgtKm9vxJJ" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@twemoji/api@17.0.3/dist/twemoji.min.js" integrity="sha384-Y5xukbGJwykbHHkTbLJykYLcBPFxrwipTbEh0puxhkz9CZ90raTPGe2Ks4vCxsYU" crossorigin="anonymous"></script>
+  <script defer src="static/scripts/emoji.js"></script>
   <script defer src="static/scripts/cookies.js"></script>
   <script defer src="static/scripts/app.js"></script>
 </head>
@@ -29,7 +32,7 @@
 
    <!-- Image Popup Modal -->
     <div class="modal fade" id="img-popup" data-bs-dismiss="modal" data-keyboard="false">
-      <div class="modal-dialog"> <!-- modal-dialog-centered -->
+      <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
 
           <!-- Image Popup Header -->
@@ -92,61 +95,62 @@
 
     {{ if .Error }}
     <div class="alert alert-danger alert-dismissible fade show m-1" role="alert">
-      {{ .Error }}
+      ⚠️ {{ .Error }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{ end }}
     {{ if .Message }}
     <div class="alert alert-primary alert-dismissible fade show m-1" role="alert">
-      {{ .Message }}
+      💭 {{ .Message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{ end }}
 
     {{ if .Loading }}
-    <div class="d-flex align-items-center" style="height: 100vh;">
-      <div class="spinner-border mx-auto" style="width: 6rem; height: 6rem;" role="status">
+    <div id="task-progress">
+      <div>
+        <div class="progress">
+          <div id="task-bar" class="progress-bar" role="progressbar" aria-label="Pins loaded" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%;"></div>
+        </div>
+        <p id="task-status" class="small mt-2 mb-0" aria-live="polite">Starting...</p>
       </div>
     </div>
     {{ end }}
+
+    <div id="images-blocked" class="alert alert-warning m-1" role="alert" hidden>
+      ⚠️ Your browser isn't loading the images from Pinterest. If you use an ad or content blocker, try turning it off for this site.
+    </div>
 
     <div class="grid">
       <div class="grid-sizer"></div>
       {{ range .Pins }}
       <div class="grid-item"{{ if and .Width .Height }} style="--pin-aspect: {{ .Width }} / {{ .Height }};"{{ end }}>
         <div class="pin-badge d-flex justify-content-center align-items-center w-100 h-100">
-          <span class="text-truncate badge bg-primary">{{ .Board.Name }}</span>
+          <span class="text-truncate badge bg-primary">{{ .Source }}</span>
         </div>
-        <img class="grid-image" loading="lazy" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" data-pin-url="https://www.pinterest.com/pin/{{ .Id }}" data-board-name="{{ .Board.Name }}"/>
+        <img class="grid-image" loading="lazy" style="background-color:{{.Color}};" src="{{ .ImageURL }}" alt="{{ .AltText }}" data-full-src="{{ .FullURL }}" data-pin-url="https://www.pinterest.com/pin/{{ .Id }}" data-board-name="{{ .Source }}"/>
       </div>
       {{ end }}
     </div>
 
     <!-- Bottom buttons -->
     {{ if not .Loading }}
-    <div class="position-fixed bottom-0 end-0" id="shuffle-deck">
-      <div class="text-nowrap text-center align-middle p-1">
-
-        <!-- THE SHUFFLE BUTTON -->
-        <div class="row m-0 pb-1">
-          <button id="shuffle-button" type="button" class="btn btn-danger btn-lg col p-1">🎲 Shuffle <span class="badge bg-light p-1">{{ len .Pins }}</span></button>
-        </div>
-
-        <!-- Boards & Settings -->
-        <div class="row g-1">
-          <div class="col-9">
-           <button type="button" class="btn btn-secondary w-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#boards-modal">📒 Boards <span class="badge bg-light p-1">{{ len .Boards }}</span></button>
-          </div>
-          <div class="col-3">
-            <button type="button" class="w-100 h-100 btn btn-secondary p-1" data-bs-toggle="modal" data-bs-target="#settings-modal">
-              <div class="text-align-middle" style="font-size:14px;">
-                <span>⚙️</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-      </div>
+    <div id="shuffle-deck">
+      <button id="shuffle-button" type="button" class="btn btn-danger btn-lg deck-button">
+        <svg id="shuffle-die" class="die" data-face="5" viewBox="0 0 36 36" aria-hidden="true">
+          <rect width="36" height="36" rx="7" fill="#f5f8fa"/>
+          <circle class="tl" cx="10" cy="10" r="3.5"/><circle class="tr" cx="26" cy="10" r="3.5"/>
+          <circle class="ml" cx="10" cy="18" r="3.5"/><circle class="c" cx="18" cy="18" r="3.5"/><circle class="mr" cx="26" cy="18" r="3.5"/>
+          <circle class="bl" cx="10" cy="26" r="3.5"/><circle class="br" cx="26" cy="26" r="3.5"/>
+        </svg>
+        Shuffle <span class="badge deck-count">{{ len .Pins }}</span>
+      </button>
+      <button type="button" class="btn btn-secondary deck-button" data-bs-toggle="modal" data-bs-target="#boards-modal">
+        📒 Boards <span class="badge deck-count">{{ len .Boards }}</span>
+      </button>
+      <button type="button" class="btn btn-secondary deck-button" data-bs-toggle="modal" data-bs-target="#settings-modal" aria-label="Settings">
+        ⚙️
+      </button>
     </div>
     {{ end }}
   </div>
@@ -175,7 +179,15 @@
 
               <div class="col">
 
-                <div class="row">
+                <div class="d-flex justify-content-center align-items-center gap-3 pb-2">
+                  <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" id="show-sections" autocomplete="off">
+                    <label class="form-check-label" for="show-sections">Show sections</label>
+                  </div>
+                  <small id="sections-status" aria-live="polite"></small>
+                </div>
+
+                <div class="row" id="boards-list">
 
                   {{ $selectedBoards := .UrlQuery.Boards }}
                   {{ $sortedBoards := SortBoards .Boards }}
@@ -183,13 +195,30 @@
                   {{ range $sortedBoards }}
 
                   {{ $checked := IsBoardSelected $selectedBoards .Id }}
+                  {{ $board := . }}
 
                   <div class="col text-nowrap p-1 d-flex justify-content-center">
-                    <input type="checkbox" class="btn-check" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if $checked }} checked="checked" {{ end }} autocomplete="off">
+                    <input type="checkbox" class="btn-check board-check" name="b" value="{{ .Id }}" id="{{ .Id }}" {{ if $checked }} checked="checked" {{ end }} autocomplete="off">
                     <label class="btn btn-outline-primary m-0 px-2 py-1" for="{{ .Id }}"> {{ .Name }}</label>
                   </div>
 
+                  <div class="board-sections" data-board-id="{{ .Id }}" data-board-name="{{ .Name }}">
+                    {{ range .Sections }}
+                    <div class="col p-1 d-flex justify-content-center">
+                      <input type="checkbox" class="btn-check section-check" name="s" value="{{ $board.Id }}:{{ .Id }}" id="section-{{ $board.Id }}-{{ .Id }}" {{ if .Selected }} checked="checked" {{ end }} autocomplete="off">
+                      <label class="btn btn-outline-primary m-0 px-2 py-1" for="section-{{ $board.Id }}-{{ .Id }}">{{ $board.Name }}: {{ .Name }}</label>
+                    </div>
+                    {{ end }}
+                  </div>
+
                   {{ end }}
+
+                  <template id="section-template">
+                    <div class="col p-1 d-flex justify-content-center">
+                      <input type="checkbox" class="btn-check section-check" name="s" autocomplete="off">
+                      <label class="btn btn-outline-primary m-0 px-2 py-1"></label>
+                    </div>
+                  </template>
 
                 </div>
 
@@ -220,14 +249,14 @@
             </div>
 
             <div class="col-4">
-              <label for="res">Resolution </label>
+              <label for="res" title="How sharp the images in the grid are. It doesn't change their size, that's up to the settings. Opening a pin always shows the sharpest version.">Grid quality</label>
 
               <!-- Resolution Input -->
               <select class="form-control p-2" id="res" name="res">
-                <option id="0" value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>150x150</option>
-                <option id="1" value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>400x300</option>
-                <option id="2" value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>600x</option>
-                <option id="3" value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>1200x</option>
+                <option value="0" {{ if eq .UrlQuery.ImageResolution 0 }} selected="selected" {{ end }}>Low</option>
+                <option value="1" {{ if eq .UrlQuery.ImageResolution 1 }} selected="selected" {{ end }}>Medium</option>
+                <option value="2" {{ if eq .UrlQuery.ImageResolution 2 }} selected="selected" {{ end }}>High</option>
+                <option value="3" {{ if eq .UrlQuery.ImageResolution 3 }} selected="selected" {{ end }}>Best</option>
               </select>
             </div>
 
@@ -289,7 +318,7 @@
 
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="theme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                Theme
+                Sketchy
               </button>
               <ul class="dropdown-menu" aria-labelledby="theme-dropdown">
                 <li><button class="dropdown-item theme-button" type="button" data-theme="static/styles/themes/morph.min.css">Morph</button></li>
@@ -346,13 +375,6 @@
 
           <hr/>
 
-          <!-- Privacy -->
-          <div class="content text-center">
-            <p class="small"><a href="/privacy" target="_blank">Privacy Policy</a></p>
-          </div>
-
-          <hr/>
-
           <div class="d-flex justify-content-around align-items-center">
 
             <div class="w-50">
@@ -362,13 +384,19 @@
               </div>
             </div>
 
-            <div class="h-100">
-              <p class="m-0 text-align-center">Made by Iggy Zuk</p>
-              <div class="d-flex p-2 justify-content-center">
-                <a href="https://twitter.com/IggyZuk/" target="_blank"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/iggyzuk?label=follow&style=social"></a>
-              </div>
+            <div class="text-center">
+              <p class="m-0">Made by <a href="https://iggyzuk.com" target="_blank" rel="noopener">Iggy Zuk</a></p>
+              <p class="m-0 small">Emoji by <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY 4.0</a></p>
             </div>
 
+          </div>
+
+          <hr/>
+
+          <!-- Privacy -->
+          <div class="content text-center">
+            <p class="small mb-1"><a href="/privacy" target="_blank">Privacy Policy</a></p>
+            <p class="small mb-0" id="build-info">Version {{ if .Build.URL }}<a href="{{ .Build.URL }}" target="_blank" rel="noopener">{{ .Build.Version }}</a>{{ else }}{{ .Build.Version }}{{ end }}{{ if .Build.Time }} · Built {{ .Build.Time }}{{ end }}</p>
           </div>
 
         </div>

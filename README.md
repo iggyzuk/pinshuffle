@@ -11,7 +11,7 @@
 ## How to Use
 
 1. Login with your Pinterest account
-1. Select some boards you'd like to mix
+1. Select some boards you'd like to mix, or turn on *Show sections* to pick parts of them
 2. Specify the total number of pins to load
 3. Hit go and start **shuffling!**
 
@@ -37,3 +37,5 @@ go test ./...
 ```
 
 Feel free to contribute.
+
+Emoji graphics are from [Twemoji](https://github.com/jdecked/twemoji), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
